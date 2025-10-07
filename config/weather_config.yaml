@@ -1,0 +1,164 @@
+# Weather Data Configuration
+# Defines weather data sources, features, and validation rules
+
+# Weather data source
+source:
+  provider: "openweathermap"  # Primary provider
+  fallback_provider: null     # Backup provider if primary fails
+  
+  # API configuration (use environment variables for keys)
+  api:
+    key_env_var: "WEATHER_API_KEY"
+    base_url: "https://api.openweathermap.org/data/2.5"
+    timeout_seconds: 30
+    retry_attempts: 3
+    retry_delay_seconds: 5
+
+# Location configuration
+location:
+  latitude: null   # Set based on feeder location
+  longitude: null  # Set based on feeder location
+  elevation_m: null
+  timezone: "UTC"
+
+# Weather features to extract
+features:
+  temperature:
+    enabled: true
+    unit: "celsius"
+    aliases: ["temp", "temperature_2m"]
+  
+  humidity:
+    enabled: true
+    unit: "percent"
+    aliases: ["relative_humidity", "humidity"]
+  
+  wind_speed:
+    enabled: true
+    unit: "m/s"
+    aliases: ["wind_speed_10m", "windspeed"]
+  
+  wind_direction:
+    enabled: false
+    unit: "degrees"
+  
+  precipitation:
+    enabled: true
+    unit: "mm"
+    aliases: ["rain", "precip"]
+  
+  cloud_cover:
+    enabled: true
+    unit: "percent"
+    aliases: ["cloudiness", "cloud_coverage"]
+  
+  pressure:
+    enabled: true
+    unit: "hPa"
+    aliases: ["surface_pressure", "pressure_msl"]
+  
+  dew_point:
+    enabled: true
+    unit: "celsius"
+    aliases: ["dewpoint", "dew_point_2m"]
+  
+  feels_like:
+    enabled: true
+    unit: "celsius"
+    aliases: ["apparent_temperature"]
+  
+  visibility:
+    enabled: false
+    unit: "meters"
+  
+  uv_index:
+    enabled: false
+
+# Derived weather features
+derived_features:
+  temperature_range:
+    enabled: true
+    description: "Daily temperature range (max - min)"
+  
+  heating_degree_days:
+    enabled: true
+    base_temp_c: 18.3  # 65°F
+  
+  cooling_degree_days:
+    enabled: true
+    base_temp_c: 18.3  # 65°F
+  
+  heat_index:
+    enabled: true
+    description: "Apparent temperature from temp + humidity"
+  
+  wind_chill:
+    enabled: false
+    description: "Apparent temperature from temp + wind"
+  
+  discomfort_index:
+    enabled: true
+    description: "Combined temp + humidity discomfort"
+
+# Data quality validation
+validation:
+  temperature:
+    min: -50
+    max: 60
+    unit: "celsius"
+  
+  humidity:
+    min: 0
+    max: 100
+    unit: "percent"
+  
+  wind_speed:
+    min: 0
+    max: 50
+    unit: "m/s"
+  
+  precipitation:
+    min: 0
+    max: 500
+    unit: "mm"
+  
+  pressure:
+    min: 900
+    max: 1100
+    unit: "hPa"
+
+# Missing data handling
+missing_data:
+  strategy: "interpolate"  # Options: interpolate, forward_fill, drop
+  max_gap_hours: 3         # Maximum gap to interpolate
+  
+# Timezone handling
+timezone:
+  source_tz: "UTC"         # Weather data timezone
+  target_tz: "UTC"         # Target timezone for alignment
+  validate_alignment: true # Verify weather-load timestamp alignment
+
+# Caching configuration
+cache:
+  enabled: true
+  directory: "data/external/weather_cache"
+  format: "parquet"
+  compression: "snappy"
+  ttl_hours: 168  # 1 week
+
+# Historical weather data
+historical:
+  source: "file"  # Options: file, api
+  file_path: "data/external/weather_historical.parquet"
+  date_column: "timestamp"
+  required_columns:
+    - "timestamp"
+    - "temperature"
+    - "humidity"
+
+# Forecast weather data (for operational use)
+forecast:
+  enabled: false
+  horizon_hours: 48
+  update_frequency_hours: 6
+  file_path: "data/external/weather_forecast.parquet"

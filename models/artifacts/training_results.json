@@ -1,0 +1,14 @@
+{
+  "model_type": "lightgbm",
+  "train_samples": 25379,
+  "test_samples": 720,
+  "n_features_original": 88,
+  "n_features_selected": 58,
+  "rmse": 0.7698198364917316,
+  "mae": 0.48552362908941965,
+  "mape": 40.35743970628736,
+  "r2": 0.24727578757618418,
+  "max_error": 6.092033479249675,
+  "baseline_persistence_rmse": 0.8922519451346375,
+  "baseline_seasonal_naive_rmse": 1.458195417376693
+}

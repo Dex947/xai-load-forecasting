@@ -1,0 +1,213 @@
+# Master Configuration for XAI Load Forecasting System
+# All paths, parameters, and settings are centralized here
+
+project:
+  name: "XAI Load Forecasting"
+  version: "1.0.0"
+  description: "Day-ahead feeder load forecasting with explainability"
+  author: "AI Consultant & Data Engineer"
+  created: "2025-10-07"
+
+# Data paths (relative to project root)
+paths:
+  data_raw: "data/raw"
+  data_processed: "data/processed"
+  data_external: "data/external"
+  models: "models/artifacts"
+  logs: "logs"
+  figures: "docs/figures"
+  notebooks: "notebooks"
+
+# Forecasting parameters
+forecasting:
+  horizon_hours: 24              # Day-ahead forecast
+  resolution_minutes: 60         # Hourly resolution
+  prediction_time: "00:00"       # Daily prediction time (midnight)
+  timezone: "UTC"                # Timezone for all operations
+
+# Feature engineering windows (in hours)
+features:
+  lag_hours: [1, 2, 3, 6, 12, 24, 48, 168]  # 1h to 1 week
+  rolling_windows: [3, 6, 12, 24, 168]      # Rolling statistics windows
+  weather_lag_hours: [0, 1, 3, 6]           # Weather feature lags
+  
+  # Temporal features
+  temporal:
+    hour_of_day: true
+    day_of_week: true
+    day_of_month: true
+    day_of_year: true
+    week_of_year: true
+    month: true
+    quarter: true
+    is_weekend: true
+    is_business_hour: true
+    season: true
+  
+  # Calendar features
+  calendar:
+    holidays: true
+    holiday_proximity: true      # Days to/from holiday
+    special_events: true
+    school_calendar: false       # Enable if data available
+  
+  # Weather features
+  weather:
+    temperature: true
+    humidity: true
+    wind_speed: true
+    precipitation: true
+    cloud_cover: true
+    pressure: true
+    dew_point: true
+    feels_like: true
+  
+  # Interaction features
+  interactions:
+    temp_hour: true              # Temperature × Hour
+    temp_weekend: true           # Temperature × Weekend
+    humidity_temp: true          # Humidity × Temperature
+
+# Model configuration
+model:
+  type: "lightgbm"               # Options: lightgbm, xgboost
+  
+  # Monotonic constraints
+  # Format: feature_name: direction (1=increasing, -1=decreasing, 0=none)
+  monotonic_constraints:
+    temperature: 1               # Higher temp → higher load (cooling)
+    # Note: May need -1 for heating-dominated feeders
+    humidity: 0
+    hour_of_day: 0
+  
+  # LightGBM parameters
+  lightgbm:
+    objective: "regression"
+    metric: "rmse"
+    boosting_type: "gbdt"
+    num_leaves: 31
+    learning_rate: 0.05
+    n_estimators: 500
+    max_depth: -1
+    min_child_samples: 20
+    subsample: 0.8
+    subsample_freq: 1
+    colsample_bytree: 0.8
+    reg_alpha: 0.1
+    reg_lambda: 0.1
+    random_state: 42
+    n_jobs: -1
+    verbose: -1
+  
+  # XGBoost parameters (alternative)
+  xgboost:
+    objective: "reg:squarederror"
+    eval_metric: "rmse"
+    booster: "gbtree"
+    max_depth: 6
+    learning_rate: 0.05
+    n_estimators: 500
+    min_child_weight: 1
+    subsample: 0.8
+    colsample_bytree: 0.8
+    gamma: 0
+    reg_alpha: 0.1
+    reg_lambda: 1
+    random_state: 42
+    n_jobs: -1
+
+# Validation strategy
+validation:
+  method: "rolling_origin"       # Rolling origin cross-validation
+  n_splits: 5                    # Number of CV splits
+  test_size_days: 30             # Test set size
+  gap_days: 1                    # Gap between train and test
+  min_train_days: 365            # Minimum training period
+
+# Explainability configuration
+explainability:
+  shap:
+    compute_global: true
+    compute_local: true
+    compute_time_varying: true
+    sample_size: 1000            # For SHAP computation efficiency
+    background_size: 100         # Background dataset size
+    
+  counterfactual:
+    enabled: true
+    n_scenarios: 5               # Number of counterfactuals per instance
+    features_to_vary: ["temperature", "humidity", "hour_of_day"]
+    
+  visualizations:
+    summary_plot: true
+    dependence_plots: true
+    force_plots: true
+    waterfall_plots: true
+    time_varying_plots: true
+
+# Data quality thresholds
+data_quality:
+  max_missing_ratio: 0.1         # Maximum allowed missing data ratio
+  outlier_std_threshold: 5       # Standard deviations for outlier detection
+  min_data_points: 8760          # Minimum data points (1 year hourly)
+  
+# Logging configuration
+logging:
+  level: "INFO"                  # DEBUG, INFO, WARNING, ERROR, CRITICAL
+  format: "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+  date_format: "%Y-%m-%d %H:%M:%S"
+  file_rotation: true
+  max_bytes: 10485760            # 10 MB
+  backup_count: 5
+
+# Weather API configuration (placeholder - use environment variables)
+weather:
+  provider: "openweathermap"     # Options: openweathermap, weatherapi, etc.
+  api_key_env: "WEATHER_API_KEY" # Environment variable name
+  cache_enabled: true
+  cache_duration_hours: 24
+  
+# Holidays configuration
+holidays:
+  country: "US"                  # ISO country code
+  state: null                    # State/province if applicable
+  custom_holidays: []            # Custom holiday dates (YYYY-MM-DD)
+
+# Performance metrics
+metrics:
+  primary: "rmse"
+  additional:
+    - "mae"
+    - "mape"
+    - "r2"
+    - "max_error"
+    - "quantile_loss"
+  
+  # Calibration metrics
+  calibration:
+    enabled: true
+    quantiles: [0.1, 0.25, 0.5, 0.75, 0.9]
+
+# Model Card configuration
+model_card:
+  scope: "Day-ahead hourly load forecasting for electrical distribution feeders"
+  intended_use: "Grid operations, demand response, maintenance scheduling"
+  out_of_scope: "Real-time forecasting, sub-hourly resolution, transmission-level"
+  
+  assumptions:
+    - "Historical patterns remain relevant"
+    - "Weather forecasts are accurate"
+    - "No major grid topology changes"
+    - "Feeder characteristics remain stable"
+  
+  limitations:
+    - "Performance degrades during extreme weather"
+    - "Holiday patterns may vary year-to-year"
+    - "Limited to trained feeder characteristics"
+    - "Requires accurate weather forecasts"
+  
+  failure_modes:
+    - "Extreme weather events (heat waves, cold snaps)"
+    - "Unexpected load changes (new large customers)"
+    - "Data quality issues (sensor failures)"
+    - "Calendar anomalies (shifted holidays)"

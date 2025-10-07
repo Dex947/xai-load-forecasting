@@ -1,0 +1,72 @@
+# Holiday Configuration
+# Defines holidays and special events that affect load patterns
+
+# Standard holidays (using Python 'holidays' library)
+standard:
+  country: "US"
+  state: null
+  observed: true  # Include observed holidays (e.g., Monday if holiday falls on Sunday)
+
+# Custom holidays and special events
+# Format: YYYY-MM-DD
+custom_holidays:
+  - "2023-12-26"  # Day after Christmas (often observed)
+  - "2024-12-26"
+  - "2025-12-26"
+
+# Special events (non-holidays that affect load)
+special_events:
+  - name: "Super Bowl Sunday"
+    dates:
+      - "2023-02-12"
+      - "2024-02-11"
+      - "2025-02-09"
+    impact: "evening_peak_shift"
+  
+  - name: "Daylight Saving Time Start"
+    dates:
+      - "2023-03-12"
+      - "2024-03-10"
+      - "2025-03-09"
+    impact: "hour_shift"
+  
+  - name: "Daylight Saving Time End"
+    dates:
+      - "2023-11-05"
+      - "2024-11-03"
+      - "2025-11-02"
+    impact: "hour_shift"
+
+# Holiday proximity features
+proximity:
+  enabled: true
+  days_before: 2   # Days before holiday to flag
+  days_after: 1    # Days after holiday to flag
+
+# Holiday type categories
+categories:
+  major:  # Major holidays with significant load impact
+    - "New Year's Day"
+    - "Memorial Day"
+    - "Independence Day"
+    - "Labor Day"
+    - "Thanksgiving"
+    - "Christmas Day"
+  
+  minor:  # Minor holidays with moderate impact
+    - "Martin Luther King Jr. Day"
+    - "Presidents' Day"
+    - "Veterans Day"
+  
+  religious:  # Religious holidays (may vary by region)
+    - "Easter"
+    - "Good Friday"
+  
+  regional:  # Region-specific holidays
+    - "Patriots' Day"  # Massachusetts, Maine
+    - "Juneteenth"
+
+# Weekend-adjacent holiday behavior
+weekend_adjacent:
+  friday_before: true   # Flag Friday before weekend holiday
+  monday_after: true    # Flag Monday after weekend holiday
