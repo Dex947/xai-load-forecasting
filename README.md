@@ -389,8 +389,8 @@ Below are key visualizations that reveal model behavior and data patterns:
 - *Red = high feature value, Blue = low feature value*
 - *Right = increases prediction, Left = decreases prediction*
 
-#### 5. SHAP Dependence: Temperature Effect
-![Temperature Dependence](docs/figures/shap_dependence_temperature.png)
+#### 5. SHAP Dependence: Rolling 24h Mean
+![Rolling 24h Mean Dependence](docs/figures/shap_dependence_rolling_24h_mean.png)
 *How temperature affects load predictions (colored by hour of day):*
 - *Higher temperatures increase load (cooling effect)*
 - *Effect is stronger during afternoon/evening hours (red points)*
@@ -419,10 +419,10 @@ We provide comprehensive documentation to ensure the model can be safely deploye
 - **Monitoring Plan**: How to track model performance in production
 
 **Additional Documentation**:
-- **README_FIRST.md**: Quick start guide for new users
+- **EXECUTION_REPORT.md**: Detailed deliverables and run logs
 - **CONTRIBUTING.md**: Guidelines for contributing to the project
 - **CHANGELOG.md**: Version history and updates
-- **PROJECT_COMPLETE.md**: Comprehensive project summary
+- **INDEX.md**: File index and navigation
 
 ---
 
@@ -557,7 +557,6 @@ If you use this project in your research, please cite:
 }
 ```
 ---
-{{ ... }}
 ## Contact
 
 For questions, suggestions, or issues:

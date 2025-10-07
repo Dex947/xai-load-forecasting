@@ -20,8 +20,6 @@ Thank you for your interest in contributing to the XAI Load Forecasting project!
 This project adheres to a code of conduct that all contributors are expected to follow:
 
 - Be respectful and inclusive
-- Welcome newcomers and help them get started
-- Focus on constructive feedback
 
 ---
 
@@ -37,6 +35,8 @@ This project adheres to a code of conduct that all contributors are expected to 
    ```bash
    git checkout -b feature/your-feature-name
    ```
+
+{{ ... }}
 
 ---
 
