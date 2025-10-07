@@ -22,15 +22,13 @@ This project adheres to a code of conduct that all contributors are expected to 
 - Be respectful and inclusive
 - Welcome newcomers and help them get started
 - Focus on constructive feedback
-- Respect differing viewpoints and experiences
-- Accept responsibility and apologize for mistakes
 
 ---
 
 ## Getting Started
 
-1. **Fork the repository** on GitHub
-2. **Clone your fork** locally:
+1. **Fork the repository** on GitHub: https://github.com/Dex947/xai-load-forecasting/fork
+2. **Clone your fork**:
    ```bash
    git clone https://github.com/your-username/xai-load-forecasting.git
    cd xai-load-forecasting
@@ -342,9 +340,9 @@ Before submitting, ensure:
 ## Questions?
 
 If you have questions about contributing:
-- Open an issue with the "question" label
-- Check existing issues and discussions
-- Review the README and documentation
+- Open a [Discussion](https://github.com/Dex947/xai-load-forecasting/discussions)
+- Check existing [Issues](https://github.com/Dex947/xai-load-forecasting/issues)
+- Review this guide README and documentation
 
 ---
 

@@ -81,7 +81,7 @@ xai-load-forecasting/
 
 1. **Clone the repository**:
 ```bash
-git clone <repository-url>
+git clone https://github.com/Dex947/xai-load-forecasting.git
 cd xai-load-forecasting
 ```
 
@@ -545,26 +545,25 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## Citation
 
-If you use this software in your research, please cite:
+If you use this project in your research, please cite:
 
 ```bibtex
 @software{xai_load_forecasting_2025,
   title = {XAI Load Forecasting: Explainable Day-Ahead Load Forecasting},
-  author = {XAI Load Forecasting Contributors},
+  author = {Dex947},
   year = {2025},
-  url = {https://github.com/your-repo/xai-load-forecasting},
-  version = {1.0.0}
+  url = {https://github.com/Dex947/xai-load-forecasting},
+  version = {1.0.1}
 }
 ```
-
 ---
-
+{{ ... }}
 ## Contact
 
 For questions, suggestions, or issues:
-- **Issues**: Open an issue on GitHub
-- **Discussions**: Use GitHub Discussions for general questions
-- **Email**: [Contact information if available]
+- **Issues**: [Open an issue on GitHub](https://github.com/Dex947/xai-load-forecasting/issues)
+- **Discussions**: [Use GitHub Discussions](https://github.com/Dex947/xai-load-forecasting/discussions)
+- **Repository**: https://github.com/Dex947/xai-load-forecasting
 
 ---
 

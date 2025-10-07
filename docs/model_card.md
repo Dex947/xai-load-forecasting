@@ -434,9 +434,9 @@ If assumptions violated:
 
 **Project**: XAI Load Forecasting  
 **Version**: 1.0.0  
-**Repository**: [GitHub URL]  
+**Repository**: https://github.com/Dex947/xai-load-forecasting  
 **Documentation**: See README.md  
-**Issues**: Open GitHub issue  
+**Issues**: https://github.com/Dex947/xai-load-forecasting/issues  
 
 ---
 
