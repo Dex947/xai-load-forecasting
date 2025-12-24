@@ -173,6 +173,7 @@ def validate_data_quality(
     df: pd.DataFrame,
     max_missing_ratio: float = 0.1,
     outlier_std_threshold: float = 5,
+    outlier_iqr_multiplier: float = 1.5,
     min_data_points: int = 8760,
 ) -> Dict[str, any]:
     """
@@ -182,6 +183,7 @@ def validate_data_quality(
         df: DataFrame to validate
         max_missing_ratio: Maximum allowed missing data ratio
         outlier_std_threshold: Standard deviations for outlier detection
+        outlier_iqr_multiplier: IQR multiplier for outlier detection (default 1.5)
         min_data_points: Minimum required data points
 
     Returns:

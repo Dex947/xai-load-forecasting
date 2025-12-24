@@ -7,11 +7,17 @@ import pandas as pd
 import numpy as np
 from pathlib import Path
 
+import os
+
 from src.models.gbm import GradientBoostingModel
 from src.explainability.shap_analysis import SHAPAnalyzer
 from src.logger import get_logger
 
 logger = get_logger(__name__)
+
+# Configuration via environment variables with sensible defaults
+MODEL_PATH = os.environ.get("MODEL_PATH", "models/artifacts/lightgbm_model.pkl")
+SHAP_PATH = os.environ.get("SHAP_PATH", "models/artifacts/shap_values.pkl")
 
 app = FastAPI(
     title="XAI Load Forecasting API",
@@ -63,23 +69,25 @@ class HealthResponse(BaseModel):
 def get_model():
     """Load or return cached model."""
     if "model" not in _model_cache:
-        model_path = Path("models/artifacts/lightgbm_model.pkl")
+        model_path = Path(MODEL_PATH)
         if not model_path.exists():
-            raise HTTPException(404, "Model not found. Train a model first.")
+            raise HTTPException(404, f"Model not found at {MODEL_PATH}. Train a model first.")
         _model_cache["model"] = GradientBoostingModel.load(str(model_path))
-        logger.info("Model loaded into cache")
+        logger.info(f"Model loaded into cache from {MODEL_PATH}")
     return _model_cache["model"]
 
 
 def get_shap_analyzer():
     """Load or return cached SHAP analyzer."""
     if "shap" not in _model_cache:
-        shap_path = Path("models/artifacts/shap_values.pkl")
+        shap_path = Path(SHAP_PATH)
         if shap_path.exists():
             shap_data = SHAPAnalyzer.load_shap_values(str(shap_path))
             _model_cache["shap_data"] = shap_data
+            logger.info(f"SHAP data loaded from {SHAP_PATH}")
         else:
             _model_cache["shap_data"] = None
+            logger.warning(f"SHAP data not found at {SHAP_PATH}")
     return _model_cache.get("shap_data")
 
 

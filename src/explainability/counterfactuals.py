@@ -131,11 +131,8 @@ class CounterfactualExplainer:
         # Get current prediction
         current_pred = self.model.predict(query_instance)[0]
 
-        # Determine direction
-        if desired_outcome > current_pred:
-            desired_range = [desired_outcome * 0.95, desired_outcome * 1.05]
-        else:
-            desired_range = [desired_outcome * 0.95, desired_outcome * 1.05]
+        # Set desired range as ±5% around target
+        desired_range = [desired_outcome * 0.95, desired_outcome * 1.05]
 
         logger.info(
             f"Generating counterfactuals: current={current_pred:.2f}, "

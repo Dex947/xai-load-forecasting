@@ -176,6 +176,7 @@ def merge_load_weather(
         logger.info(f"Weather data: {weather_start} to {weather_end}")
 
     # Merge on index
+    original_load_count = len(load_df)
     merged_df = load_df.merge(
         weather_df,
         left_index=True,
@@ -183,6 +184,14 @@ def merge_load_weather(
         how=how,
         suffixes=("", "_weather"),
     )
+
+    # Warn if rows were dropped during merge
+    rows_dropped = original_load_count - len(merged_df)
+    if rows_dropped > 0:
+        logger.warning(
+            f"Merge dropped {rows_dropped} rows ({rows_dropped/original_load_count*100:.1f}%) "
+            f"due to missing weather data. Original: {original_load_count}, Merged: {len(merged_df)}"
+        )
 
     logger.info(f"Merged data shape: {merged_df.shape}")
     logger.info(

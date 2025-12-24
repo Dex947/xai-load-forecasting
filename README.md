@@ -157,7 +157,7 @@ MIT License - see [LICENSE](LICENSE)
 
 <div align="center">
 
-**Current Version**: 2.0.0
+**Current Version**: 3.0.0
 
 [⬆ Back to top](#-xai-load-forecasting)
 

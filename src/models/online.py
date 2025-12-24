@@ -237,8 +237,11 @@ class OnlineForecaster:
 
     def reset_metrics(self):
         """Reset all metrics."""
-        for metric in self.metrics.values():
-            metric = metric.clone()
+        self.metrics = {
+            "mae": metrics.MAE(),
+            "rmse": metrics.RMSE(),
+            "r2": metrics.R2(),
+        }
         logger.info("Metrics reset")
 
     def save_state(self, path: str):

@@ -261,11 +261,26 @@ class TestMultiArmedBandit:
 def test_imports():
     """Test that all new modules can be imported."""
     # Data modules
+    from src.data.solar import SolarDataFetcher
+    from src.data.sources import DataSourceManager
 
     # Model modules
+    from src.models.conformal import ConformalForecaster
+    from src.models.online import OnlineForecaster, HybridForecaster
+    from src.models.quantile import QuantileForecaster
+    from src.models.multi_horizon import MultiHorizonForecaster
 
     # MLOps modules
+    from src.mlops.tracking import ExperimentTracker
+    from src.mlops.registry import ModelRegistry
+    from src.mlops.ab_testing import ABTestManager, MultiArmedBandit
 
     # Explainability modules
+    from src.explainability.counterfactuals import CounterfactualExplainer
+    from src.explainability.drift_explanation import DriftExplainer
+    from src.explainability.natural_language import NaturalLanguageExplainer
+
+    # Monitoring modules
+    from src.monitoring.drift import DriftDetector, PerformanceMonitor
 
     assert True  # If we get here, all imports succeeded

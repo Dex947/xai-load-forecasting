@@ -85,6 +85,8 @@ class ConformalForecaster:
         )
 
         logger.info(f"Fitting conformal predictor on {len(X)} samples...")
+        # Store feature names and index for later use
+        self.feature_names = list(X.columns)
         self.mapie_model.fit(X.values, y.values)
         self.is_fitted = True
 

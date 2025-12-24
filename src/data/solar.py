@@ -73,6 +73,15 @@ class SolarDataFetcher:
             response = requests.get(self.BASE_URL, params=params, timeout=60)
             response.raise_for_status()
             data = response.json()
+        except requests.Timeout:
+            logger.error(f"Timeout fetching solar data from {self.BASE_URL}")
+            raise ConnectionError("Solar API request timed out. Try again later.")
+        except requests.ConnectionError as e:
+            logger.error(f"Connection error fetching solar data: {e}")
+            raise ConnectionError(f"Cannot connect to solar API: {e}")
+        except requests.HTTPError as e:
+            logger.error(f"HTTP error {response.status_code}: {e}")
+            raise ValueError(f"Solar API returned error {response.status_code}: {response.text[:200]}")
         except requests.RequestException as e:
             logger.error(f"Failed to fetch solar data: {e}")
             raise

@@ -16,18 +16,45 @@ logger = get_logger(__name__)
 class DriftDetector:
     """Detects feature and prediction drift."""
 
-    def __init__(self, reference_data: pd.DataFrame, threshold: float = 0.05):
+    def __init__(
+        self,
+        reference_data: pd.DataFrame,
+        threshold: float = 0.05,
+        sample_size: int = 1000,
+    ):
         """
         Args:
             reference_data: Training data to use as reference distribution
             threshold: P-value threshold for drift detection (default 0.05)
+            sample_size: Number of samples to store for distribution comparison
         """
         self.reference_stats = self._compute_stats(reference_data)
         self.threshold = threshold
         self.feature_names = list(reference_data.columns)
+        self.sample_size = sample_size
+
+        # Store actual reference samples for proper distribution comparison
+        self.reference_samples = self._store_reference_samples(reference_data)
+
         logger.info(
-            f"DriftDetector initialized with {len(self.feature_names)} features"
+            f"DriftDetector initialized with {len(self.feature_names)} features, "
+            f"{len(self.reference_samples.get(self.feature_names[0], []))} reference samples"
         )
+
+    def _store_reference_samples(self, df: pd.DataFrame) -> Dict[str, np.ndarray]:
+        """Store actual reference samples for each feature."""
+        samples = {}
+        for col in df.columns:
+            if df[col].dtype in [np.float64, np.int64, np.float32, np.int32]:
+                col_data = df[col].dropna().values
+                if len(col_data) > self.sample_size:
+                    # Random sample for efficiency
+                    np.random.seed(42)
+                    indices = np.random.choice(len(col_data), self.sample_size, replace=False)
+                    samples[col] = col_data[indices]
+                else:
+                    samples[col] = col_data
+        return samples
 
     def _compute_stats(self, df: pd.DataFrame) -> Dict[str, Dict]:
         """Compute reference statistics for each feature."""
@@ -68,10 +95,11 @@ class DriftDetector:
                 continue
 
             # Kolmogorov-Smirnov test for distribution shift
-            # Generate reference samples from stored stats (approximation)
-            ref_samples = np.random.normal(
-                ref_stats["mean"], ref_stats["std"] + 1e-8, size=len(current)
-            )
+            # Use actual stored reference samples for accurate comparison
+            ref_samples = self.reference_samples.get(col)
+            if ref_samples is None or len(ref_samples) == 0:
+                results[col] = {"status": "no_reference", "drift": False}
+                continue
 
             ks_stat, p_value = stats.ks_2samp(ref_samples, current.values)
 
@@ -107,32 +135,37 @@ class DriftDetector:
         }
 
     def save_reference(self, path: str):
-        """Save reference statistics to file."""
+        """Save reference statistics and samples to file."""
+        import joblib
+
         Path(path).parent.mkdir(parents=True, exist_ok=True)
-        with open(path, "w") as f:
-            json.dump(
-                {
-                    "reference_stats": self.reference_stats,
-                    "threshold": self.threshold,
-                    "feature_names": self.feature_names,
-                    "created_at": datetime.now().isoformat(),
-                },
-                f,
-                indent=2,
-            )
-        logger.info(f"Reference stats saved to {path}")
+
+        # Save as pickle to preserve numpy arrays
+        data = {
+            "reference_stats": self.reference_stats,
+            "reference_samples": self.reference_samples,
+            "threshold": self.threshold,
+            "feature_names": self.feature_names,
+            "sample_size": self.sample_size,
+            "created_at": datetime.now().isoformat(),
+        }
+        joblib.dump(data, path)
+        logger.info(f"Reference stats and samples saved to {path}")
 
     @classmethod
     def load_reference(cls, path: str) -> "DriftDetector":
-        """Load reference statistics from file."""
-        with open(path) as f:
-            data = json.load(f)
+        """Load reference statistics and samples from file."""
+        import joblib
+
+        data = joblib.load(path)
 
         # Create empty detector and populate
         detector = cls.__new__(cls)
         detector.reference_stats = data["reference_stats"]
+        detector.reference_samples = data.get("reference_samples", {})
         detector.threshold = data["threshold"]
         detector.feature_names = data["feature_names"]
+        detector.sample_size = data.get("sample_size", 1000)
 
         logger.info(f"Reference stats loaded from {path}")
         return detector

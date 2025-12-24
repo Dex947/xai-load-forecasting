@@ -2,9 +2,10 @@ FROM python:3.11-slim
 
 WORKDIR /app
 
-# Install system dependencies
+# Install system dependencies (gcc for compilation, libgomp for LightGBM OpenMP)
 RUN apt-get update && apt-get install -y --no-install-recommends \
     gcc \
+    libgomp1 \
     && rm -rf /var/lib/apt/lists/*
 
 # Copy requirements first for caching

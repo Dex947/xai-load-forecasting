@@ -37,6 +37,9 @@ jobs:
 
       - name: Lint with ruff
         run: |
+          # E501: line too long (handled by formatter)
+          # E402: module level import not at top (needed for sys.path manipulation)
+          # F841: local variable assigned but never used (false positives in some patterns)
           ruff check src/ scripts/ tests/ --ignore E501,E402,F841
 
       - name: Type check with mypy

@@ -14,9 +14,9 @@ def sample_load_df():
         freq="h",
         tz="UTC",
     )
-    np.random.seed(42)
+    rng = np.random.default_rng(42)
     load = (
-        5 + 3 * np.sin(np.arange(720) * 2 * np.pi / 24) + np.random.normal(0, 0.5, 720)
+        5 + 3 * np.sin(np.arange(720) * 2 * np.pi / 24) + rng.normal(0, 0.5, 720)
     )
     return pd.DataFrame({"load": load}, index=dates)
 
@@ -25,17 +25,17 @@ def sample_load_df():
 def sample_weather_df():
     """Create sample weather data for testing."""
     dates = pd.date_range(start="2023-01-01", periods=720, freq="h", tz="UTC")
-    np.random.seed(42)
+    rng = np.random.default_rng(42)
     return pd.DataFrame(
         {
             "temperature": 15
             + 10 * np.sin(np.arange(720) * 2 * np.pi / 24)
-            + np.random.normal(0, 2, 720),
-            "humidity": 60 + np.random.normal(0, 10, 720),
-            "wind_speed": 5 + np.random.exponential(2, 720),
-            "precipitation": np.random.exponential(0.1, 720),
-            "pressure": 1013 + np.random.normal(0, 5, 720),
-            "cloud_cover": np.clip(50 + np.random.normal(0, 20, 720), 0, 100),
+            + rng.normal(0, 2, 720),
+            "humidity": 60 + rng.normal(0, 10, 720),
+            "wind_speed": 5 + rng.exponential(2, 720),
+            "precipitation": rng.exponential(0.1, 720),
+            "pressure": 1013 + rng.normal(0, 5, 720),
+            "cloud_cover": np.clip(50 + rng.normal(0, 20, 720), 0, 100),
         },
         index=dates,
     )

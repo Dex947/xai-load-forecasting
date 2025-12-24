@@ -19,9 +19,11 @@ def cli():
 @click.option("--config", "-c", default="config/config.yaml", help="Config file path")
 def profile(config):
     """Run data profiling on raw data."""
+    import os
+    os.environ["CONFIG_PATH"] = config
     from scripts.run_data_profiling import main
 
-    click.echo("Running data profiling...")
+    click.echo(f"Running data profiling with config: {config}")
     exit_code = main()
     sys.exit(exit_code)
 
@@ -30,9 +32,11 @@ def profile(config):
 @click.option("--config", "-c", default="config/config.yaml", help="Config file path")
 def features(config):
     """Generate features from processed data."""
+    import os
+    os.environ["CONFIG_PATH"] = config
     from scripts.run_feature_engineering import main
 
-    click.echo("Running feature engineering...")
+    click.echo(f"Running feature engineering with config: {config}")
     exit_code = main()
     sys.exit(exit_code)
 
@@ -41,9 +45,11 @@ def features(config):
 @click.option("--config", "-c", default="config/config.yaml", help="Config file path")
 def train(config):
     """Train the forecasting model."""
+    import os
+    os.environ["CONFIG_PATH"] = config
     from scripts.run_model_training import main
 
-    click.echo("Training model...")
+    click.echo(f"Training model with config: {config}")
     exit_code = main()
     sys.exit(exit_code)
 
@@ -52,9 +58,11 @@ def train(config):
 @click.option("--config", "-c", default="config/config.yaml", help="Config file path")
 def explain(config):
     """Run SHAP analysis on trained model."""
+    import os
+    os.environ["CONFIG_PATH"] = config
     from scripts.run_shap_analysis import main
 
-    click.echo("Running SHAP analysis...")
+    click.echo(f"Running SHAP analysis with config: {config}")
     exit_code = main()
     sys.exit(exit_code)
 
@@ -63,7 +71,7 @@ def explain(config):
 @click.option("--model", "-m", required=True, help="Path to trained model")
 @click.option("--data", "-d", required=True, help="Path to input data (CSV/Parquet)")
 @click.option("--output", "-o", default=None, help="Output file for predictions")
-@click.option("--horizon", "-h", default=24, help="Forecast horizon in hours")
+@click.option("--horizon", default=24, help="Forecast horizon in hours")
 def predict(model, data, output, horizon):
     """Generate predictions from a trained model."""
     import pandas as pd

@@ -137,23 +137,38 @@ class ExperimentTracker:
             registered_name: Optional name for model registry
             input_example: Example input for signature inference
         """
-        # Determine model flavor
-        model_type = type(model).__name__
+        # Determine model flavor using duck typing for reliability
+        model_module = type(model).__module__
 
-        if "lightgbm" in model_type.lower() or hasattr(model, "booster_"):
+        # Check for LightGBM
+        is_lightgbm = (
+            "lightgbm" in model_module.lower()
+            or hasattr(model, "booster_")
+            or (hasattr(model, "model_") and "lightgbm" in type(model.model_).__module__.lower())
+        )
+
+        # Check for XGBoost
+        is_xgboost = (
+            "xgboost" in model_module.lower()
+            or hasattr(model, "get_booster")
+        )
+
+        if is_lightgbm:
             mlflow.lightgbm.log_model(
                 model,
                 artifact_path,
                 registered_model_name=registered_name,
                 input_example=input_example,
             )
-        elif "xgboost" in model_type.lower():
+            logger.debug("Logged as LightGBM model")
+        elif is_xgboost:
             mlflow.xgboost.log_model(
                 model,
                 artifact_path,
                 registered_model_name=registered_name,
                 input_example=input_example,
             )
+            logger.debug("Logged as XGBoost model")
         else:
             # Generic sklearn model
             mlflow.sklearn.log_model(
@@ -162,6 +177,7 @@ class ExperimentTracker:
                 registered_model_name=registered_name,
                 input_example=input_example,
             )
+            logger.debug("Logged as sklearn model")
 
         logger.info(f"Logged model to {artifact_path}")
 

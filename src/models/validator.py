@@ -85,7 +85,7 @@ class RollingOriginValidator:
             raise ValueError("Not enough data for even one split")
 
         # Calculate step size between splits
-        if self.n_splits > 1:
+        if self.n_splits > 1 and available_days > 0:
             step_days = available_days / (self.n_splits - 1)
         else:
             step_days = 0

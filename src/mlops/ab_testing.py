@@ -74,22 +74,26 @@ class ABTestManager:
         # Determine routing for each sample
         n_samples = len(X)
         use_challenger = np.random.random(n_samples) < self.traffic_split
+        champion_mask = ~use_challenger
 
         predictions = np.zeros(n_samples)
-        models_used = []
+        models_used = [""] * n_samples  # Pre-allocate to maintain order
 
         # Champion predictions
-        champion_mask = ~use_challenger
         if champion_mask.any():
             champion_preds = self.champion.predict(X[champion_mask])
             predictions[champion_mask] = champion_preds
-            models_used.extend(["champion"] * champion_mask.sum())
+            for i, is_champion in enumerate(champion_mask):
+                if is_champion:
+                    models_used[i] = "champion"
 
         # Challenger predictions
         if use_challenger.any():
             challenger_preds = self.challenger.predict(X[use_challenger])
             predictions[use_challenger] = challenger_preds
-            models_used.extend(["challenger"] * use_challenger.sum())
+            for i, is_challenger in enumerate(use_challenger):
+                if is_challenger:
+                    models_used[i] = "challenger"
 
         if return_model:
             return predictions, models_used

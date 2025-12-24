@@ -77,7 +77,10 @@ class MultiHorizonForecaster:
             y_val = y_valid.iloc[train_end:]
 
             if len(X_train) < 100 or len(X_val) < 10:
-                logger.warning(f"Insufficient data for horizon {h}h, skipping")
+                logger.warning(
+                    f"Insufficient data for horizon {h}h (train={len(X_train)}, val={len(X_val)}), skipping. "
+                    f"Need at least 100 train and 10 val samples."
+                )
                 continue
 
             train_data = lgb.Dataset(X_train, label=y_train)
