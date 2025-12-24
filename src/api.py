@@ -16,7 +16,7 @@ logger = get_logger(__name__)
 app = FastAPI(
     title="XAI Load Forecasting API",
     description="Day-ahead load prediction with SHAP explanations",
-    version="1.0.0"
+    version="1.0.0",
 )
 
 # Global model cache
@@ -25,30 +25,35 @@ _model_cache: Dict[str, Any] = {}
 
 class PredictionRequest(BaseModel):
     """Request body for predictions."""
+
     features: Dict[str, float] = Field(..., description="Feature name-value pairs")
     explain: bool = Field(False, description="Include SHAP explanation")
 
 
 class PredictionResponse(BaseModel):
     """Response body for predictions."""
+
     prediction: float
     explanation: Optional[Dict[str, float]] = None
 
 
 class BatchPredictionRequest(BaseModel):
     """Request body for batch predictions."""
+
     data: List[Dict[str, float]]
     explain: bool = False
 
 
 class BatchPredictionResponse(BaseModel):
     """Response body for batch predictions."""
+
     predictions: List[float]
     explanations: Optional[List[Dict[str, float]]] = None
 
 
 class HealthResponse(BaseModel):
     """Health check response."""
+
     status: str
     model_loaded: bool
     model_type: Optional[str] = None
@@ -87,41 +92,40 @@ def health_check():
             status="healthy",
             model_loaded=True,
             model_type=model.model_type,
-            n_features=len(model.feature_names)
+            n_features=len(model.feature_names),
         )
     except Exception:
-        return HealthResponse(
-            status="degraded",
-            model_loaded=False
-        )
+        return HealthResponse(status="degraded", model_loaded=False)
 
 
 @app.post("/predict", response_model=PredictionResponse)
 def predict(request: PredictionRequest):
     """Generate a single prediction with optional SHAP explanation."""
     model = get_model()
-    
+
     # Validate features
     missing = set(model.feature_names) - set(request.features.keys())
     if missing:
         raise HTTPException(400, f"Missing features: {missing}")
-    
+
     # Build feature vector in correct order
     X = pd.DataFrame([{f: request.features[f] for f in model.feature_names}])
-    
+
     prediction = float(model.predict(X)[0])
-    
+
     explanation = None
     if request.explain:
         shap_data = get_shap_analyzer()
         if shap_data:
             # Simple approximation using global importance
-            importance = pd.DataFrame({
-                "feature": shap_data["feature_names"],
-                "importance": np.abs(shap_data["shap_values"]).mean(axis=0)
-            })
+            importance = pd.DataFrame(
+                {
+                    "feature": shap_data["feature_names"],
+                    "importance": np.abs(shap_data["shap_values"]).mean(axis=0),
+                }
+            )
             explanation = dict(zip(importance["feature"], importance["importance"]))
-    
+
     return PredictionResponse(prediction=prediction, explanation=explanation)
 
 
@@ -129,20 +133,20 @@ def predict(request: PredictionRequest):
 def predict_batch(request: BatchPredictionRequest):
     """Generate batch predictions."""
     model = get_model()
-    
+
     # Build DataFrame
     X = pd.DataFrame(request.data)
-    
+
     # Validate features
     missing = set(model.feature_names) - set(X.columns)
     if missing:
         raise HTTPException(400, f"Missing features: {missing}")
-    
+
     # Reorder columns
     X = X[model.feature_names]
-    
+
     predictions = model.predict(X).tolist()
-    
+
     return BatchPredictionResponse(predictions=predictions)
 
 

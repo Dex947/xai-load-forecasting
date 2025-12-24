@@ -13,7 +13,4 @@ Modules:
 from .shap_analysis import SHAPAnalyzer
 from .visualizations import ExplainabilityVisualizer
 
-__all__ = [
-    'SHAPAnalyzer',
-    'ExplainabilityVisualizer'
-]
+__all__ = ["SHAPAnalyzer", "ExplainabilityVisualizer"]

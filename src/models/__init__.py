@@ -14,8 +14,4 @@ from .baseline import BaselineModel
 from .gbm import GradientBoostingModel
 from .validator import RollingOriginValidator
 
-__all__ = [
-    'BaselineModel',
-    'GradientBoostingModel',
-    'RollingOriginValidator'
-]
+__all__ = ["BaselineModel", "GradientBoostingModel", "RollingOriginValidator"]

@@ -16,17 +16,17 @@ logger = get_logger(__name__)
 class ABTestManager:
     """
     A/B testing framework for comparing champion vs challenger models.
-    
+
     Supports statistical significance testing for safe model promotion.
     """
-    
+
     def __init__(
         self,
         champion_model: Any,
         challenger_model: Any,
         traffic_split: float = 0.1,
         min_samples: int = 100,
-        significance_level: float = 0.05
+        significance_level: float = 0.05,
     ):
         """
         Args:
@@ -41,108 +41,97 @@ class ABTestManager:
         self.traffic_split = traffic_split
         self.min_samples = min_samples
         self.significance_level = significance_level
-        
+
         # Results tracking
         self.champion_errors: List[float] = []
         self.challenger_errors: List[float] = []
         self.champion_predictions: List[Tuple[float, float]] = []  # (pred, actual)
         self.challenger_predictions: List[Tuple[float, float]] = []
-        
+
         # Test state
         self.test_started = datetime.now()
         self.test_concluded = False
         self.winner: Optional[str] = None
-        
+
         logger.info(
             f"ABTestManager initialized: split={traffic_split}, "
             f"min_samples={min_samples}"
         )
-    
+
     def predict(
-        self,
-        X: pd.DataFrame,
-        return_model: bool = False
+        self, X: pd.DataFrame, return_model: bool = False
     ) -> Tuple[np.ndarray, Optional[str]]:
         """
         Route prediction to champion or challenger based on split.
-        
+
         Args:
             X: Feature DataFrame
             return_model: Return which model was used
-            
+
         Returns:
             Predictions and optionally model name
         """
         # Determine routing for each sample
         n_samples = len(X)
         use_challenger = np.random.random(n_samples) < self.traffic_split
-        
+
         predictions = np.zeros(n_samples)
         models_used = []
-        
+
         # Champion predictions
         champion_mask = ~use_challenger
         if champion_mask.any():
             champion_preds = self.champion.predict(X[champion_mask])
             predictions[champion_mask] = champion_preds
             models_used.extend(["champion"] * champion_mask.sum())
-        
+
         # Challenger predictions
         if use_challenger.any():
             challenger_preds = self.challenger.predict(X[use_challenger])
             predictions[use_challenger] = challenger_preds
             models_used.extend(["challenger"] * use_challenger.sum())
-        
+
         if return_model:
             return predictions, models_used
         return predictions, None
-    
-    def record_outcome(
-        self,
-        y_pred: float,
-        y_true: float,
-        model: str
-    ):
+
+    def record_outcome(self, y_pred: float, y_true: float, model: str):
         """
         Record prediction outcome for analysis.
-        
+
         Args:
             y_pred: Predicted value
             y_true: Actual value
             model: 'champion' or 'challenger'
         """
         error = abs(y_true - y_pred)
-        
+
         if model == "champion":
             self.champion_errors.append(error)
             self.champion_predictions.append((y_pred, y_true))
         else:
             self.challenger_errors.append(error)
             self.challenger_predictions.append((y_pred, y_true))
-    
-    def record_batch(
-        self,
-        X: pd.DataFrame,
-        y_true: pd.Series
-    ):
+
+    def record_batch(self, X: pd.DataFrame, y_true: pd.Series):
         """
         Record batch of predictions and outcomes.
-        
+
         Args:
             X: Feature DataFrame
             y_true: True values
         """
         predictions, models = self.predict(X, return_model=True)
-        
+
         for i, (pred, actual, model) in enumerate(
             zip(predictions, y_true.values, models)
         ):
             self.record_outcome(pred, actual, model)
-    
+
     def get_metrics(self) -> Dict[str, Dict[str, float]]:
         """Get current metrics for both models."""
         metrics = {}
-        
+
         if self.champion_errors:
             metrics["champion"] = {
                 "n_samples": len(self.champion_errors),
@@ -150,7 +139,7 @@ class ABTestManager:
                 "rmse": np.sqrt(np.mean(np.array(self.champion_errors) ** 2)),
                 "std": np.std(self.champion_errors),
             }
-        
+
         if self.challenger_errors:
             metrics["challenger"] = {
                 "n_samples": len(self.challenger_errors),
@@ -158,21 +147,21 @@ class ABTestManager:
                 "rmse": np.sqrt(np.mean(np.array(self.challenger_errors) ** 2)),
                 "std": np.std(self.challenger_errors),
             }
-        
+
         return metrics
-    
+
     def test_significance(self) -> Dict[str, Any]:
         """
         Perform statistical significance test.
-        
+
         Uses Welch's t-test to compare mean absolute errors.
-        
+
         Returns:
             Test results dict
         """
         n_champion = len(self.champion_errors)
         n_challenger = len(self.challenger_errors)
-        
+
         if n_champion < self.min_samples or n_challenger < self.min_samples:
             return {
                 "sufficient_data": False,
@@ -180,21 +169,19 @@ class ABTestManager:
                 "challenger_samples": n_challenger,
                 "min_required": self.min_samples,
             }
-        
+
         # Welch's t-test (unequal variances)
         t_stat, p_value = stats.ttest_ind(
-            self.champion_errors,
-            self.challenger_errors,
-            equal_var=False
+            self.champion_errors, self.challenger_errors, equal_var=False
         )
-        
+
         champion_mae = np.mean(self.champion_errors)
         challenger_mae = np.mean(self.challenger_errors)
-        
+
         # Determine winner
         significant = p_value < self.significance_level
         challenger_better = challenger_mae < champion_mae
-        
+
         if significant and challenger_better:
             winner = "challenger"
             recommendation = "PROMOTE challenger to production"
@@ -204,19 +191,20 @@ class ABTestManager:
         else:
             winner = None
             recommendation = "CONTINUE testing (no significant difference)"
-        
+
         # Effect size (Cohen's d)
         pooled_std = np.sqrt(
             (np.var(self.champion_errors) + np.var(self.challenger_errors)) / 2
         )
         cohens_d = (champion_mae - challenger_mae) / pooled_std if pooled_std > 0 else 0
-        
+
         # Improvement percentage
         improvement_pct = (
             (champion_mae - challenger_mae) / champion_mae * 100
-            if champion_mae > 0 else 0
+            if champion_mae > 0
+            else 0
         )
-        
+
         result = {
             "sufficient_data": True,
             "champion_mae": float(champion_mae),
@@ -232,39 +220,39 @@ class ABTestManager:
             "champion_samples": n_champion,
             "challenger_samples": n_challenger,
         }
-        
+
         logger.info(
             f"Significance test: p={p_value:.4f}, "
             f"improvement={improvement_pct:.2f}%, "
             f"recommendation={recommendation}"
         )
-        
+
         return result
-    
+
     def conclude_test(self) -> Dict[str, Any]:
         """
         Conclude the A/B test and return final results.
-        
+
         Returns:
             Final test results
         """
         results = self.test_significance()
-        
+
         if results.get("sufficient_data"):
             self.test_concluded = True
             self.winner = results.get("winner")
-        
+
         results["test_duration_hours"] = (
             datetime.now() - self.test_started
         ).total_seconds() / 3600
-        
+
         return results
-    
+
     def get_summary(self) -> Dict[str, Any]:
         """Get complete test summary."""
         metrics = self.get_metrics()
         significance = self.test_significance()
-        
+
         return {
             "test_started": self.test_started.isoformat(),
             "test_concluded": self.test_concluded,
@@ -273,13 +261,13 @@ class ABTestManager:
             "significance_test": significance,
             "winner": self.winner,
         }
-    
+
     def save_results(self, path: str):
         """Save test results to JSON."""
         Path(path).parent.mkdir(parents=True, exist_ok=True)
-        
+
         results = self.get_summary()
-        
+
         # Convert numpy types
         def convert(obj):
             if isinstance(obj, np.ndarray):
@@ -289,31 +277,33 @@ class ABTestManager:
             if isinstance(obj, (np.float64, np.float32)):
                 return float(obj)
             return obj
-        
+
         with open(path, "w") as f:
             json.dump(results, f, indent=2, default=convert)
-        
+
         logger.info(f"A/B test results saved to {path}")
-    
+
     def should_promote_challenger(self) -> bool:
         """Check if challenger should be promoted based on test results."""
         results = self.test_significance()
-        
+
         return (
-            results.get("sufficient_data", False) and
-            results.get("significant", False) and
-            results.get("winner") == "challenger"
+            results.get("sufficient_data", False)
+            and results.get("significant", False)
+            and results.get("winner") == "challenger"
         )
 
 
 class MultiArmedBandit:
     """
     Thompson Sampling bandit for adaptive model selection.
-    
+
     Automatically routes more traffic to better-performing models.
     """
-    
-    def __init__(self, models: Dict[str, Any], prior_alpha: float = 1.0, prior_beta: float = 1.0):
+
+    def __init__(
+        self, models: Dict[str, Any], prior_alpha: float = 1.0, prior_beta: float = 1.0
+    ):
         """
         Args:
             models: Dict of model_name -> model
@@ -322,17 +312,17 @@ class MultiArmedBandit:
         """
         self.models = models
         self.model_names = list(models.keys())
-        
+
         # Beta distribution parameters for each model
         self.alphas = {name: prior_alpha for name in self.model_names}
         self.betas = {name: prior_beta for name in self.model_names}
-        
+
         # Performance tracking
         self.successes = {name: 0 for name in self.model_names}
         self.failures = {name: 0 for name in self.model_names}
-        
+
         logger.info(f"MultiArmedBandit initialized with {len(models)} models")
-    
+
     def select_model(self) -> str:
         """Select model using Thompson Sampling."""
         samples = {
@@ -340,11 +330,11 @@ class MultiArmedBandit:
             for name in self.model_names
         }
         return max(samples, key=samples.get)
-    
+
     def update(self, model_name: str, error: float, threshold: float = 1.0):
         """
         Update model statistics based on prediction error.
-        
+
         Args:
             model_name: Model that made prediction
             error: Absolute prediction error
@@ -356,17 +346,17 @@ class MultiArmedBandit:
         else:
             self.failures[model_name] += 1
             self.betas[model_name] += 1
-    
+
     def get_selection_probabilities(self, n_samples: int = 1000) -> Dict[str, float]:
         """Estimate selection probability for each model."""
         selections = {name: 0 for name in self.model_names}
-        
+
         for _ in range(n_samples):
             selected = self.select_model()
             selections[selected] += 1
-        
+
         return {name: count / n_samples for name, count in selections.items()}
-    
+
     def get_summary(self) -> Dict[str, Any]:
         """Get bandit summary."""
         return {

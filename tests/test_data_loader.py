@@ -6,6 +6,7 @@ import numpy as np
 from pathlib import Path
 
 import sys
+
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
 from src.data.loader import load_load_data, merge_load_weather
@@ -18,14 +19,11 @@ class TestLoadLoadData:
         """Verify CSV loading with proper datetime parsing."""
         csv_file = tmp_path / "load.csv"
         dates = pd.date_range("2023-01-01", periods=24, freq="h")
-        df = pd.DataFrame({
-            "timestamp": dates,
-            "load": np.random.rand(24) * 10
-        })
+        df = pd.DataFrame({"timestamp": dates, "load": np.random.rand(24) * 10})
         df.to_csv(csv_file, index=False)
-        
+
         result = load_load_data(str(csv_file))
-        
+
         assert isinstance(result.index, pd.DatetimeIndex)
         assert "load" in result.columns
         assert len(result) == 24
@@ -39,7 +37,7 @@ class TestLoadLoadData:
         """Verify ValueError when required columns missing."""
         csv_file = tmp_path / "bad.csv"
         pd.DataFrame({"wrong_col": [1, 2, 3]}).to_csv(csv_file, index=False)
-        
+
         with pytest.raises(ValueError):
             load_load_data(str(csv_file))
 
@@ -50,7 +48,7 @@ class TestMergeLoadWeather:
     def test_merges_on_index(self, sample_load_df, sample_weather_df):
         """Verify proper index-based merge."""
         result = merge_load_weather(sample_load_df, sample_weather_df)
-        
+
         assert "load" in result.columns
         assert "temperature" in result.columns
         assert len(result) == len(sample_load_df)
@@ -59,12 +57,12 @@ class TestMergeLoadWeather:
         """Verify ValueError when no temporal overlap."""
         load_df = pd.DataFrame(
             {"load": [1, 2, 3]},
-            index=pd.date_range("2020-01-01", periods=3, freq="h", tz="UTC")
+            index=pd.date_range("2020-01-01", periods=3, freq="h", tz="UTC"),
         )
         weather_df = pd.DataFrame(
             {"temperature": [10, 11, 12]},
-            index=pd.date_range("2025-01-01", periods=3, freq="h", tz="UTC")
+            index=pd.date_range("2025-01-01", periods=3, freq="h", tz="UTC"),
         )
-        
+
         with pytest.raises(ValueError, match="No overlap"):
             merge_load_weather(load_df, weather_df)

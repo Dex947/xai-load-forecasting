@@ -20,6 +20,7 @@ def cli():
 def profile(config):
     """Run data profiling on raw data."""
     from scripts.run_data_profiling import main
+
     click.echo("Running data profiling...")
     exit_code = main()
     sys.exit(exit_code)
@@ -30,6 +31,7 @@ def profile(config):
 def features(config):
     """Generate features from processed data."""
     from scripts.run_feature_engineering import main
+
     click.echo("Running feature engineering...")
     exit_code = main()
     sys.exit(exit_code)
@@ -40,6 +42,7 @@ def features(config):
 def train(config):
     """Train the forecasting model."""
     from scripts.run_model_training import main
+
     click.echo("Training model...")
     exit_code = main()
     sys.exit(exit_code)
@@ -50,6 +53,7 @@ def train(config):
 def explain(config):
     """Run SHAP analysis on trained model."""
     from scripts.run_shap_analysis import main
+
     click.echo("Running SHAP analysis...")
     exit_code = main()
     sys.exit(exit_code)
@@ -64,30 +68,27 @@ def predict(model, data, output, horizon):
     """Generate predictions from a trained model."""
     import pandas as pd
     from src.models.gbm import GradientBoostingModel
-    
+
     click.echo(f"Loading model from {model}...")
     gbm = GradientBoostingModel.load(model)
-    
+
     click.echo(f"Loading data from {data}...")
     if data.endswith(".parquet"):
         df = pd.read_parquet(data)
     else:
         df = pd.read_csv(data, index_col=0, parse_dates=True)
-    
+
     # Get feature columns that match model
     feature_cols = [c for c in df.columns if c in gbm.feature_names]
     if len(feature_cols) < len(gbm.feature_names):
         missing = set(gbm.feature_names) - set(feature_cols)
         click.echo(f"Warning: Missing features: {missing}", err=True)
-    
+
     X = df[feature_cols]
     predictions = gbm.predict(X)
-    
-    result = pd.DataFrame({
-        "timestamp": df.index,
-        "prediction": predictions
-    })
-    
+
+    result = pd.DataFrame({"timestamp": df.index, "prediction": predictions})
+
     if output:
         result.to_csv(output, index=False)
         click.echo(f"Predictions saved to {output}")
@@ -99,9 +100,9 @@ def predict(model, data, output, horizon):
 def test():
     """Run the test suite."""
     import subprocess
+
     result = subprocess.run(
-        [sys.executable, "-m", "pytest", "tests/", "-v"],
-        cwd=PROJECT_ROOT
+        [sys.executable, "-m", "pytest", "tests/", "-v"], cwd=PROJECT_ROOT
     )
     sys.exit(result.returncode)
 
@@ -113,6 +114,7 @@ def serve(host, port):
     """Start the prediction API server."""
     try:
         import uvicorn
+
         click.echo(f"Starting API server on {host}:{port}...")
         uvicorn.run("src.api:app", host=host, port=port, reload=True)
     except ImportError:

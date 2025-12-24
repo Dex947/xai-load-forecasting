@@ -12,31 +12,33 @@ def sample_load_df():
         start="2023-01-01",
         periods=720,  # 30 days
         freq="h",
-        tz="UTC"
+        tz="UTC",
     )
     np.random.seed(42)
-    load = 5 + 3 * np.sin(np.arange(720) * 2 * np.pi / 24) + np.random.normal(0, 0.5, 720)
+    load = (
+        5 + 3 * np.sin(np.arange(720) * 2 * np.pi / 24) + np.random.normal(0, 0.5, 720)
+    )
     return pd.DataFrame({"load": load}, index=dates)
 
 
 @pytest.fixture
 def sample_weather_df():
     """Create sample weather data for testing."""
-    dates = pd.date_range(
-        start="2023-01-01",
-        periods=720,
-        freq="h",
-        tz="UTC"
-    )
+    dates = pd.date_range(start="2023-01-01", periods=720, freq="h", tz="UTC")
     np.random.seed(42)
-    return pd.DataFrame({
-        "temperature": 15 + 10 * np.sin(np.arange(720) * 2 * np.pi / 24) + np.random.normal(0, 2, 720),
-        "humidity": 60 + np.random.normal(0, 10, 720),
-        "wind_speed": 5 + np.random.exponential(2, 720),
-        "precipitation": np.random.exponential(0.1, 720),
-        "pressure": 1013 + np.random.normal(0, 5, 720),
-        "cloud_cover": np.clip(50 + np.random.normal(0, 20, 720), 0, 100),
-    }, index=dates)
+    return pd.DataFrame(
+        {
+            "temperature": 15
+            + 10 * np.sin(np.arange(720) * 2 * np.pi / 24)
+            + np.random.normal(0, 2, 720),
+            "humidity": 60 + np.random.normal(0, 10, 720),
+            "wind_speed": 5 + np.random.exponential(2, 720),
+            "precipitation": np.random.exponential(0.1, 720),
+            "pressure": 1013 + np.random.normal(0, 5, 720),
+            "cloud_cover": np.clip(50 + np.random.normal(0, 20, 720), 0, 100),
+        },
+        index=dates,
+    )
 
 
 @pytest.fixture
@@ -64,11 +66,11 @@ def train_test_split(sample_features_df):
     split_idx = int(len(sample_features_df) * 0.8)
     train = sample_features_df.iloc[:split_idx]
     test = sample_features_df.iloc[split_idx:]
-    
+
     feature_cols = [c for c in train.columns if c != "load"]
     X_train = train[feature_cols]
     y_train = train["load"]
     X_test = test[feature_cols]
     y_test = test["load"]
-    
+
     return X_train, X_test, y_train, y_test

@@ -15,8 +15,4 @@ from .temporal import TemporalFeatureEngineer
 from .calendar import CalendarFeatureEngineer
 from .pipeline import FeaturePipeline
 
-__all__ = [
-    'TemporalFeatureEngineer',
-    'CalendarFeatureEngineer',
-    'FeaturePipeline'
-]
+__all__ = ["TemporalFeatureEngineer", "CalendarFeatureEngineer", "FeaturePipeline"]
