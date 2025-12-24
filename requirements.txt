@@ -46,3 +46,12 @@ optuna>=3.5.0
 # Testing
 pytest>=7.4.0
 pytest-cov>=4.1.0
+
+# Probabilistic Forecasting
+mapie>=0.8.0
+
+# Online Learning
+river>=0.21.0
+
+# MLOps
+mlflow>=2.10.0

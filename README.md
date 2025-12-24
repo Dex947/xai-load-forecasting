@@ -8,7 +8,7 @@
 
 [![Python 3.9+](https://img.shields.io/badge/python-3.9+-blue.svg)](https://www.python.org/downloads/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
-[![Tests](https://img.shields.io/badge/tests-24%20passed-brightgreen.svg)]()
+[![Tests](https://img.shields.io/badge/tests-38%20passed-brightgreen.svg)]()
 [![Docker](https://img.shields.io/badge/docker-ready-blue.svg)]()
 [![FastAPI](https://img.shields.io/badge/API-FastAPI-009688.svg)]()
 
@@ -42,11 +42,12 @@ Grid operators need **accurate** load forecasts, but they also need to **underst
 
 | Category | Capabilities |
 |----------|-------------|
-| **Forecasting** | Day-ahead (24h), multi-horizon (1h to 1 week) |
-| **Explainability** | Global/local SHAP, time-varying patterns |
-| **Models** | LightGBM/XGBoost, monotonic constraints, quantile regression |
+| **Forecasting** | Day-ahead (24h), multi-horizon (1h to 1 week), probabilistic intervals |
+| **Explainability** | SHAP, counterfactuals, natural language explanations |
+| **Models** | LightGBM/XGBoost, conformal prediction, online learning |
+| **MLOps** | MLflow tracking, model registry, A/B testing |
 | **Deployment** | FastAPI, Docker, CLI |
-| **Monitoring** | Drift detection, performance alerts |
+| **Monitoring** | Data drift, concept drift, performance alerts |
 
 ---
 

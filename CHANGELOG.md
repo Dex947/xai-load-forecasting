@@ -6,6 +6,45 @@ and this project adheres to [semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [Unreleased] - v3.0.0
+
+### Added
+
+**Data Expansion**:
+- Solar irradiance data fetcher (`src/data/solar.py`) with Open-Meteo API integration
+- Unified data source manager (`src/data/sources.py`) for multi-source data handling
+- Solar-derived features: GHI, DNI, DHI, clearness index, solar availability
+
+**Probabilistic Forecasting**:
+- Conformal prediction with MAPIE EnbPI method (`src/models/conformal.py`)
+- Guaranteed coverage prediction intervals
+- Winkler score and CRPS metrics
+
+**Online Learning**:
+- River-based online forecaster (`src/models/online.py`) for streaming updates
+- ADWIN and Page-Hinkley drift detection
+- Hybrid batch+online ensemble forecaster
+
+**MLOps**:
+- MLflow experiment tracking (`src/mlops/tracking.py`)
+- Model registry with staging/production stages (`src/mlops/registry.py`)
+- A/B testing framework with statistical significance (`src/mlops/ab_testing.py`)
+- Multi-armed bandit for adaptive model selection
+
+**Explainability Extensions**:
+- Counterfactual explanations with DiCE (`src/explainability/counterfactuals.py`)
+- Concept drift explanation via SHAP changes (`src/explainability/drift_explanation.py`)
+- Natural language explanation generator (`src/explainability/natural_language.py`)
+
+**Testing**:
+- 14 new tests for advanced modules (38 total)
+
+### Changed
+
+- Updated requirements.txt with mapie, river, mlflow dependencies
+
+---
+
 ## [2.0.0] - 2025-12-24
 
 ### Added
