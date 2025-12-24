@@ -1,9 +1,8 @@
 """Holiday and calendar feature engineering."""
 
 import pandas as pd
-import numpy as np
-from typing import Dict, List, Optional
-from datetime import datetime, timedelta
+from typing import Dict, Optional
+from datetime import timedelta
 import holidays
 
 from src.logger import get_logger
@@ -36,7 +35,7 @@ class CalendarFeatureEngineer:
         for date_str in self.holidays_config.get('custom_holidays', []):
             try:
                 self.custom_holidays.add(pd.to_datetime(date_str).date())
-            except Exception as e:
+            except Exception:
                 logger.warning(f"Invalid custom holiday date: {date_str}")
         
         # Special events
@@ -47,7 +46,7 @@ class CalendarFeatureEngineer:
                 try:
                     date = pd.to_datetime(date_str).date()
                     self.special_events[date] = event_name
-                except Exception as e:
+                except Exception:
                     logger.warning(f"Invalid special event date: {date_str}")
         
         logger.info(f"Calendar feature engineer initialized for {self.country}")

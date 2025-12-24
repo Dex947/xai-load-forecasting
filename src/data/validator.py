@@ -14,11 +14,9 @@ Usage:
 
 import pandas as pd
 import numpy as np
-from typing import Optional, Dict, List, Tuple
-from datetime import datetime, timedelta
+from typing import Optional, Dict, List
 
 from src.logger import get_logger
-from src.config import load_config
 
 logger = get_logger(__name__)
 

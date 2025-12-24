@@ -3,13 +3,12 @@
 import pytest
 import pandas as pd
 import numpy as np
-import tempfile
 from pathlib import Path
 
 import sys
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
-from src.data.loader import load_load_data, load_weather_data, merge_load_weather
+from src.data.loader import load_load_data, merge_load_weather
 
 
 class TestLoadLoadData:

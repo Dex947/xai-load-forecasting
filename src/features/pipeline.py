@@ -3,8 +3,7 @@ Feature engineering pipeline orchestration.
 """
 
 import pandas as pd
-import numpy as np
-from typing import Dict, List, Optional, Tuple
+from typing import Dict, Optional
 from pathlib import Path
 
 from src.logger import get_logger
@@ -48,7 +47,8 @@ class FeaturePipeline:
     def create_all_features(
         self,
         df: pd.DataFrame,
-        target_column: str = 'load'
+        target_column: str = 'load',
+        include_target: bool = True
     ) -> pd.DataFrame:
         """Generate all features from raw load/weather data."""
         logger.info("Creating all features")

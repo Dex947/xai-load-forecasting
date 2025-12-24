@@ -64,7 +64,6 @@ def predict(model, data, output, horizon):
     """Generate predictions from a trained model."""
     import pandas as pd
     from src.models.gbm import GradientBoostingModel
-    from src.features.pipeline import FeaturePipeline
     
     click.echo(f"Loading model from {model}...")
     gbm = GradientBoostingModel.load(model)

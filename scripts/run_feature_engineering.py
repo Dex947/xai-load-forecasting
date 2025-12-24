@@ -7,9 +7,6 @@ from pathlib import Path
 PROJECT_ROOT = Path(__file__).parent.parent
 sys.path.insert(0, str(PROJECT_ROOT))
 
-import pandas as pd
-import numpy as np
-from datetime import datetime
 
 from src.logger import setup_logging_from_config, get_logger
 from src.config import load_config
@@ -75,7 +72,7 @@ def main():
             include_target=True  # Include target for training
         )
         
-        logger.info(f"Feature engineering complete!")
+        logger.info("Feature engineering complete!")
         logger.info(f"Total features: {len(features.columns)}")
         logger.info(f"Dataset shape: {features.shape}")
         
@@ -127,11 +124,11 @@ def main():
         logger.info("\n" + "=" * 80)
         logger.info("FEATURE ENGINEERING COMPLETE")
         logger.info("=" * 80)
-        logger.info(f"\nGenerated files:")
+        logger.info("\nGenerated files:")
         logger.info(f"  Features (Parquet): {output_file}")
         logger.info(f"  Features (CSV): {output_csv}")
         logger.info(f"  Feature names: {feature_names_file}")
-        logger.info(f"\nDataset summary:")
+        logger.info("\nDataset summary:")
         logger.info(f"  Total samples: {len(features):,}")
         logger.info(f"  Total features: {len(features.columns)}")
         logger.info(f"  Date range: {features.index.min()} to {features.index.max()}")

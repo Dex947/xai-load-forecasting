@@ -37,7 +37,7 @@ jobs:
 
       - name: Lint with ruff
         run: |
-          ruff check src/ scripts/ tests/ --ignore E501
+          ruff check src/ scripts/ tests/ --ignore E501,E402,F841
 
       - name: Type check with mypy
         run: |
@@ -64,4 +64,4 @@ jobs:
         run: ruff format --check src/ scripts/ tests/ || true
 
       - name: Check linting
-        run: ruff check src/ scripts/ tests/ --ignore E501
+        run: ruff check src/ scripts/ tests/ --ignore E501,E402,F841

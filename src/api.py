@@ -89,7 +89,7 @@ def health_check():
             model_type=model.model_type,
             n_features=len(model.feature_names)
         )
-    except Exception as e:
+    except Exception:
         return HealthResponse(
             status="degraded",
             model_loaded=False

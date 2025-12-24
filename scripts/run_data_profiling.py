@@ -85,7 +85,7 @@ def main():
         # Step 4: Temporal consistency check
         logger.info("\n[Step 4/6] Checking temporal consistency...")
         consistency_metrics = check_temporal_consistency(df, expected_freq='h')
-        logger.info(f"Temporal consistency:")
+        logger.info("Temporal consistency:")
         logger.info(f"  Duplicates: {consistency_metrics['duplicates']}")
         logger.info(f"  Missing timestamps: {consistency_metrics['n_gaps']}")
         logger.info(f"  Irregular intervals: {consistency_metrics['irregular_intervals']}")

@@ -3,7 +3,6 @@ Time-series cross-validation with rolling origin.
 """
 
 import pandas as pd
-import numpy as np
 from typing import Iterator, Tuple, Optional, List, Dict
 from datetime import timedelta
 

@@ -2,7 +2,7 @@
 
 import pandas as pd
 import numpy as np
-from typing import Dict, List, Optional, Tuple, Any
+from typing import Dict, List, Optional
 import joblib
 from pathlib import Path
 
@@ -272,7 +272,7 @@ class GradientBoostingModel:
         }
         
         joblib.dump(model_data, file_path)
-        logger.info(f"Model saved successfully")
+        logger.info("Model saved successfully")
     
     @classmethod
     def load(cls, file_path: str) -> 'GradientBoostingModel':

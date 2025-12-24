@@ -1,8 +1,6 @@
 """Tests for feature engineering modules."""
 
-import pytest
 import pandas as pd
-import numpy as np
 from pathlib import Path
 
 import sys

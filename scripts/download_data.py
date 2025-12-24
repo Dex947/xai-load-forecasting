@@ -10,13 +10,10 @@ Data Sources:
 """
 
 import pandas as pd
-import numpy as np
 import requests
 from pathlib import Path
 import zipfile
 import io
-from datetime import datetime, timedelta
-import time
 
 # Setup paths
 PROJECT_ROOT = Path(__file__).parent.parent
@@ -146,7 +143,7 @@ def process_uci_load_data(df):
     })
     
     print(f"  Processed shape: {load_df.shape}")
-    print(f"  Load statistics:")
+    print("  Load statistics:")
     print(f"    Mean: {load_df['load'].mean():.2f} kW")
     print(f"    Std: {load_df['load'].std():.2f} kW")
     print(f"    Min: {load_df['load'].min():.2f} kW")
@@ -226,7 +223,7 @@ def download_weather_data(start_date, end_date, latitude=41.15, longitude=-8.61)
     weather_df = weather_df.set_index('timestamp')
     
     print(f"  Weather data shape: {weather_df.shape}")
-    print(f"  Weather statistics:")
+    print("  Weather statistics:")
     print(f"    Temperature: {weather_df['temperature'].mean():.1f}°C (±{weather_df['temperature'].std():.1f})")
     print(f"    Humidity: {weather_df['humidity'].mean():.1f}% (±{weather_df['humidity'].std():.1f})")
     print(f"    Wind speed: {weather_df['wind_speed'].mean():.1f} m/s")
@@ -300,9 +297,9 @@ def main():
         print("✓ DATA DOWNLOAD COMPLETE")
         print("=" * 80)
         print("\nAvailable datasets:")
-        print(f"  1. Full load data: data/raw/load_data.csv")
-        print(f"  2. Weather data: data/external/weather.csv")
-        print(f"  3. Sample (2013): data/raw/sample_data_2013.csv")
+        print("  1. Full load data: data/raw/load_data.csv")
+        print("  2. Weather data: data/external/weather.csv")
+        print("  3. Sample (2013): data/raw/sample_data_2013.csv")
         print("\nNext steps:")
         print("  1. Run: jupyter notebook notebooks/01_data_profiling.ipynb")
         print("  2. Or use the sample dataset for quick testing")

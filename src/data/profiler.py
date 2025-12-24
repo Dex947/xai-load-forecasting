@@ -20,7 +20,6 @@ import seaborn as sns
 from typing import Dict, List, Optional, Tuple
 from pathlib import Path
 from scipy import stats
-from statsmodels.tsa.seasonal import seasonal_decompose
 from statsmodels.graphics.tsaplots import plot_acf, plot_pacf
 
 from src.logger import get_logger

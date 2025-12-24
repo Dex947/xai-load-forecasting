@@ -8,8 +8,6 @@ PROJECT_ROOT = Path(__file__).parent.parent
 sys.path.insert(0, str(PROJECT_ROOT))
 
 import pandas as pd
-import numpy as np
-import matplotlib.pyplot as plt
 
 from src.logger import setup_logging_from_config, get_logger
 from src.config import load_config
@@ -195,7 +193,7 @@ def main():
         logger.info("\n" + "=" * 80)
         logger.info("SHAP ANALYSIS COMPLETE")
         logger.info("=" * 80)
-        logger.info(f"\nGenerated files:")
+        logger.info("\nGenerated files:")
         logger.info(f"  SHAP values: {shap_file}")
         logger.info(f"  Global importance: {importance_file}")
         logger.info(f"  Visualizations: {len(list(FIGURES_DIR.glob('shap_*.png')))} plots in {FIGURES_DIR}")

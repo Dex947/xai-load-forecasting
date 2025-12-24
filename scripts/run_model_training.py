@@ -8,16 +8,12 @@ PROJECT_ROOT = Path(__file__).parent.parent
 sys.path.insert(0, str(PROJECT_ROOT))
 
 import pandas as pd
-import numpy as np
 import matplotlib.pyplot as plt
-import seaborn as sns
-from datetime import datetime
 
 from src.logger import setup_logging_from_config, get_logger
 from src.config import load_config
-from src.models.baseline import BaselineModel, compare_baselines
+from src.models.baseline import compare_baselines
 from src.models.gbm import GradientBoostingModel
-from src.models.validator import RollingOriginValidator
 
 # Setup logging
 setup_logging_from_config()
@@ -375,11 +371,11 @@ def main():
         logger.info("\n" + "=" * 80)
         logger.info("MODEL TRAINING COMPLETE")
         logger.info("=" * 80)
-        logger.info(f"\nModel Performance:")
+        logger.info("\nModel Performance:")
         logger.info(f"  RMSE: {test_metrics['rmse']:.4f}")
         logger.info(f"  MAE: {test_metrics['mae']:.4f}")
         logger.info(f"  R²: {test_metrics['r2']:.4f}")
-        logger.info(f"\nGenerated files:")
+        logger.info("\nGenerated files:")
         logger.info(f"  Model: {model_file}")
         logger.info(f"  Feature importance: {importance_file}")
         logger.info(f"  Predictions plot: {plot_file}")
