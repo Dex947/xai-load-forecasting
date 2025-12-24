@@ -28,7 +28,7 @@ This project adheres to a code of conduct that all contributors are expected to 
 1. **Fork the repository** on GitHub: https://github.com/Dex947/xai-load-forecasting/fork
 2. **Clone your fork**:
    ```bash
-   git clone https://github.com/your-username/xai-load-forecasting.git
+   git clone https://github.com/Dex947/xai-load-forecasting.git
    cd xai-load-forecasting
    ```
 3. **Create a branch** for your changes:

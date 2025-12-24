@@ -1,10 +1,4 @@
-"""
-Feature Engineering Script
-===========================
-
-Creates all features for model training with strict temporal rigor.
-Generates 100+ features from load, weather, temporal, and calendar data.
-"""
+"""Feature engineering script."""
 
 import sys
 from pathlib import Path

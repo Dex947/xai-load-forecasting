@@ -1,16 +1,4 @@
-"""
-Calendar Feature Engineering
-=============================
-
-Creates holiday and calendar-based features.
-Handles standard holidays, custom events, and holiday proximity.
-
-Usage:
-    from src.features.calendar import CalendarFeatureEngineer
-    
-    engineer = CalendarFeatureEngineer(holidays_config)
-    features = engineer.create_features(df)
-"""
+"""Holiday and calendar feature engineering."""
 
 import pandas as pd
 import numpy as np
@@ -24,22 +12,13 @@ logger = get_logger(__name__)
 
 
 class CalendarFeatureEngineer:
-    """
-    Creates calendar and holiday-based features.
-    """
+    """Holiday flags, proximity, and special event features."""
     
     def __init__(
         self,
         calendar_config: Optional[Dict] = None,
         holidays_config: Optional[Dict] = None
     ):
-        """
-        Initialize calendar feature engineer.
-        
-        Args:
-            calendar_config: Calendar feature configuration
-            holidays_config: Holidays configuration
-        """
         self.calendar_config = calendar_config or {}
         self.holidays_config = holidays_config or {}
         

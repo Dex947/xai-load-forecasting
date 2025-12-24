@@ -1,16 +1,4 @@
-"""
-Explainability Visualizations
-==============================
-
-Visualization functions for SHAP analysis and model explanations.
-
-Usage:
-    from src.explainability.visualizations import ExplainabilityVisualizer
-    
-    viz = ExplainabilityVisualizer(shap_values, feature_names, X_data)
-    viz.plot_summary()
-    viz.plot_dependence('temperature')
-"""
+"""SHAP visualization utilities."""
 
 import pandas as pd
 import numpy as np
@@ -26,9 +14,7 @@ logger = get_logger(__name__)
 
 
 class ExplainabilityVisualizer:
-    """
-    Visualization tools for model explainability.
-    """
+    """SHAP summary, dependence, waterfall, and force plots."""
     
     def __init__(
         self,
@@ -37,15 +23,6 @@ class ExplainabilityVisualizer:
         X_data: pd.DataFrame,
         expected_value: Optional[float] = None
     ):
-        """
-        Initialize visualizer.
-        
-        Args:
-            shap_values: SHAP values array
-            feature_names: List of feature names
-            X_data: Feature data
-            expected_value: Expected value (base value) from explainer
-        """
         self.shap_values = shap_values
         self.feature_names = feature_names
         self.X_data = X_data

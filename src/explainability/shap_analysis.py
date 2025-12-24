@@ -1,17 +1,4 @@
-"""
-SHAP Analysis Module
-====================
-
-Computes SHAP values for model explainability.
-Supports global, local, and time-varying SHAP analysis.
-
-Usage:
-    from src.explainability.shap_analysis import SHAPAnalyzer
-    
-    analyzer = SHAPAnalyzer(model, X_background)
-    shap_values = analyzer.compute_shap_values(X_test)
-    analyzer.plot_summary()
-"""
+"""SHAP value computation and analysis."""
 
 import pandas as pd
 import numpy as np
@@ -26,9 +13,7 @@ logger = get_logger(__name__)
 
 
 class SHAPAnalyzer:
-    """
-    SHAP-based model explainability analyzer.
-    """
+    """Computes global, local, and time-varying SHAP importance."""
     
     def __init__(
         self,
@@ -37,15 +22,6 @@ class SHAPAnalyzer:
         model_type: str = 'tree',
         config: Optional[Dict] = None
     ):
-        """
-        Initialize SHAP analyzer.
-        
-        Args:
-            model: Trained model (LightGBM or XGBoost)
-            X_background: Background dataset for SHAP
-            model_type: Model type ('tree' for tree-based models)
-            config: SHAP configuration
-        """
         self.model = model
         self.X_background = X_background
         self.model_type = model_type
@@ -61,7 +37,6 @@ class SHAPAnalyzer:
         self._initialize_explainer()
     
     def _initialize_explainer(self) -> None:
-        """Initialize SHAP explainer based on model type."""
         logger.info("Initializing SHAP explainer")
         
         if self.model_type == 'tree':
@@ -89,16 +64,7 @@ class SHAPAnalyzer:
         X: pd.DataFrame,
         check_additivity: bool = False
     ) -> np.ndarray:
-        """
-        Compute SHAP values for given data.
-        
-        Args:
-            X: Data to explain
-            check_additivity: Whether to check SHAP additivity property
-        
-        Returns:
-            SHAP values array
-        """
+        """Compute SHAP values, sampling if dataset is large."""
         logger.info(f"Computing SHAP values for {len(X)} samples")
         
         # Sample if too large

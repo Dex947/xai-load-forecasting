@@ -1,16 +1,4 @@
-"""
-Temporal Feature Engineering
-=============================
-
-Creates temporal features from datetime index.
-All features respect temporal boundaries to prevent data leakage.
-
-Usage:
-    from src.features.temporal import TemporalFeatureEngineer
-    
-    engineer = TemporalFeatureEngineer(config)
-    features = engineer.create_features(df)
-"""
+"""Temporal feature extraction from datetime index."""
 
 import pandas as pd
 import numpy as np
@@ -23,31 +11,15 @@ logger = get_logger(__name__)
 
 
 class TemporalFeatureEngineer:
-    """
-    Creates temporal features from datetime index.
-    """
+    """Extracts hour, day, week, cyclical, and lag features."""
     
     def __init__(self, config: Optional[Dict] = None):
-        """
-        Initialize temporal feature engineer.
-        
-        Args:
-            config: Configuration dictionary with feature flags
-        """
         self.config = config or {}
         self.temporal_config = self.config.get('temporal', {})
         logger.info("Temporal feature engineer initialized")
     
     def create_features(self, df: pd.DataFrame) -> pd.DataFrame:
-        """
-        Create all enabled temporal features.
-        
-        Args:
-            df: DataFrame with DatetimeIndex
-        
-        Returns:
-            DataFrame with temporal features
-        """
+        """Generate temporal features from DatetimeIndex."""
         if not isinstance(df.index, pd.DatetimeIndex):
             raise ValueError("DataFrame must have DatetimeIndex")
         
@@ -143,21 +115,7 @@ class TemporalFeatureEngineer:
         lag_hours: List[int],
         prefix: str = "lag"
     ) -> pd.DataFrame:
-        """
-        Create lag features for target column.
-        
-        CRITICAL: This respects temporal boundaries - shifted values
-        are only available for timestamps where they would be known.
-        
-        Args:
-            df: DataFrame with target column
-            target_column: Name of target column
-            lag_hours: List of lag hours
-            prefix: Prefix for lag feature names
-        
-        Returns:
-            DataFrame with lag features
-        """
+        """Create lagged features. Uses shift() to prevent leakage."""
         logger.info(f"Creating {len(lag_hours)} lag features for {target_column}")
         
         if target_column not in df.columns:
@@ -181,21 +139,7 @@ class TemporalFeatureEngineer:
         windows: List[int],
         functions: List[str] = ['mean', 'std', 'min', 'max']
     ) -> pd.DataFrame:
-        """
-        Create rolling window features.
-        
-        CRITICAL: Uses .shift(1) to ensure no data leakage.
-        Rolling statistics only use past data.
-        
-        Args:
-            df: DataFrame with target column
-            target_column: Name of target column
-            windows: List of window sizes (in hours)
-            functions: List of aggregation functions
-        
-        Returns:
-            DataFrame with rolling features
-        """
+        """Create rolling stats. Uses shift(1) to prevent leakage."""
         logger.info(f"Creating rolling features for {target_column}")
         
         if target_column not in df.columns:
@@ -225,17 +169,7 @@ class TemporalFeatureEngineer:
         target_column: str,
         periods: List[int] = [1, 24, 168]
     ) -> pd.DataFrame:
-        """
-        Create difference features (change from previous period).
-        
-        Args:
-            df: DataFrame with target column
-            target_column: Name of target column
-            periods: List of periods for differencing
-        
-        Returns:
-            DataFrame with difference features
-        """
+        """Create difference features (change from prior period)."""
         logger.info(f"Creating difference features for {target_column}")
         
         if target_column not in df.columns:

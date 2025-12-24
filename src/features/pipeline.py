@@ -1,15 +1,5 @@
 """
-Feature Engineering Pipeline
-=============================
-
-Orchestrates all feature engineering steps in correct order.
-Ensures temporal integrity and no data leakage.
-
-Usage:
-    from src.features.pipeline import FeaturePipeline
-    
-    pipeline = FeaturePipeline(config)
-    features = pipeline.create_all_features(df, target_column='load')
+Feature engineering pipeline orchestration.
 """
 
 import pandas as pd
@@ -27,22 +17,9 @@ logger = get_logger(__name__)
 
 
 class FeaturePipeline:
-    """
-    Orchestrates all feature engineering steps.
-    """
+    """Coordinates temporal, calendar, weather, and interaction features."""
     
-    def __init__(
-        self,
-        config: Optional[Dict] = None,
-        holidays_config: Optional[Dict] = None
-    ):
-        """
-        Initialize feature pipeline.
-        
-        Args:
-            config: Main configuration dictionary
-            holidays_config: Holidays configuration dictionary
-        """
+    def __init__(self, config: Optional[Dict] = None):
         if config is None:
             config_obj = load_config()
             self.config = {
@@ -52,9 +29,6 @@ class FeaturePipeline:
         else:
             self.config = config
         
-        if holidays_config is None:
-            holidays_config = load_holidays_config()
-        
         # Initialize feature engineers
         self.temporal_engineer = TemporalFeatureEngineer(
             self.config['features']
@@ -62,7 +36,7 @@ class FeaturePipeline:
         
         self.calendar_engineer = CalendarFeatureEngineer(
             calendar_config=self.config['features'].get('calendar', {}),
-            holidays_config=holidays_config
+            holidays_config=load_holidays_config()
         )
         
         self.weather_engineer = WeatherFeatureEngineer(
@@ -74,20 +48,9 @@ class FeaturePipeline:
     def create_all_features(
         self,
         df: pd.DataFrame,
-        target_column: str = 'load',
-        include_target: bool = False
+        target_column: str = 'load'
     ) -> pd.DataFrame:
-        """
-        Create all features for forecasting.
-        
-        Args:
-            df: DataFrame with load and weather data
-            target_column: Name of target column
-            include_target: Whether to include target column in output
-        
-        Returns:
-            DataFrame with all features
-        """
+        """Generate all features from raw load/weather data."""
         logger.info("Creating all features")
         
         if not isinstance(df.index, pd.DatetimeIndex):

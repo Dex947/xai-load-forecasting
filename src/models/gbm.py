@@ -1,17 +1,4 @@
-"""
-Gradient Boosting Models
-=========================
-
-LightGBM and XGBoost models with monotonic constraints.
-Supports temporal validation and hyperparameter tuning.
-
-Usage:
-    from src.models.gbm import GradientBoostingModel
-    
-    model = GradientBoostingModel(model_type='lightgbm', config=config)
-    model.fit(X_train, y_train)
-    predictions = model.predict(X_test)
-"""
+"""LightGBM/XGBoost wrapper with monotonic constraint support."""
 
 import pandas as pd
 import numpy as np
@@ -39,9 +26,7 @@ logger = get_logger(__name__)
 
 
 class GradientBoostingModel:
-    """
-    Gradient boosting model with monotonic constraints.
-    """
+    """Gradient boosting model with monotonic constraints."""
     
     def __init__(
         self,
@@ -49,15 +34,7 @@ class GradientBoostingModel:
         config: Optional[Dict] = None,
         monotonic_constraints: Optional[Dict[str, int]] = None
     ):
-        """
-        Initialize gradient boosting model.
-        
-        Args:
-            model_type: Model type ('lightgbm' or 'xgboost')
-            config: Model configuration dictionary
-            monotonic_constraints: Dictionary mapping feature names to constraint directions
-                                  (1 = increasing, -1 = decreasing, 0 = none)
-        """
+        """Initialize with model type, config, and optional monotonic constraints."""
         self.model_type = model_type.lower()
         self.config = config or {}
         self.monotonic_constraints = monotonic_constraints or {}
@@ -83,19 +60,7 @@ class GradientBoostingModel:
         y_val: Optional[pd.Series] = None,
         verbose: bool = True
     ) -> 'GradientBoostingModel':
-        """
-        Fit gradient boosting model.
-        
-        Args:
-            X_train: Training features
-            y_train: Training target
-            X_val: Validation features (optional)
-            y_val: Validation target (optional)
-            verbose: Whether to print training progress
-        
-        Returns:
-            Self
-        """
+        """Train model with optional validation set for early stopping."""
         logger.info(f"Training {self.model_type} model")
         logger.info(f"Training samples: {len(X_train)}, Features: {len(X_train.columns)}")
         
@@ -133,7 +98,6 @@ class GradientBoostingModel:
         monotone_constraints: List[int],
         verbose: bool
     ) -> None:
-        """Fit LightGBM model."""
         params = self.config.get('lightgbm', {}).copy()
         
         # Add monotonic constraints
@@ -172,7 +136,6 @@ class GradientBoostingModel:
         monotone_constraints: List[int],
         verbose: bool
     ) -> None:
-        """Fit XGBoost model."""
         params = self.config.get('xgboost', {}).copy()
         
         # Add monotonic constraints
@@ -199,15 +162,7 @@ class GradientBoostingModel:
         )
     
     def predict(self, X: pd.DataFrame) -> np.ndarray:
-        """
-        Generate predictions.
-        
-        Args:
-            X: Features
-        
-        Returns:
-            Predictions array
-        """
+        """Generate predictions for input features."""
         if self.model is None:
             raise ValueError("Model must be fitted before prediction")
         
@@ -222,15 +177,7 @@ class GradientBoostingModel:
         return predictions
     
     def _prepare_monotonic_constraints(self, feature_names: List[str]) -> List[int]:
-        """
-        Prepare monotonic constraints in correct order.
-        
-        Args:
-            feature_names: List of feature names
-        
-        Returns:
-            List of constraint values (1, -1, or 0) in feature order
-        """
+        """Map constraint dict to ordered list matching feature order."""
         constraints = []
         
         for feature in feature_names:
@@ -252,7 +199,6 @@ class GradientBoostingModel:
         return constraints
     
     def _get_feature_importance(self) -> pd.DataFrame:
-        """Get feature importance."""
         if self.model_type == 'lightgbm':
             importance = self.model.feature_importance(importance_type='gain')
         elif self.model_type == 'xgboost':
@@ -266,15 +212,7 @@ class GradientBoostingModel:
         return importance_df
     
     def get_feature_importance(self, top_n: Optional[int] = None) -> pd.DataFrame:
-        """
-        Get feature importance.
-        
-        Args:
-            top_n: Return top N features (None for all)
-        
-        Returns:
-            DataFrame with feature importance
-        """
+        """Return feature importance DataFrame, optionally top N."""
         if self.feature_importance_ is None:
             raise ValueError("Model must be fitted first")
         
@@ -289,17 +227,7 @@ class GradientBoostingModel:
         y: pd.Series,
         metrics: Optional[List[str]] = None
     ) -> Dict[str, float]:
-        """
-        Evaluate model performance.
-        
-        Args:
-            X: Features
-            y: True target values
-            metrics: List of metrics to compute
-        
-        Returns:
-            Dictionary with metric values
-        """
+        """Compute evaluation metrics (RMSE, MAE, MAPE, R², max_error)."""
         if metrics is None:
             metrics = ['rmse', 'mae', 'mape', 'r2', 'max_error']
         
@@ -314,7 +242,9 @@ class GradientBoostingModel:
             results['mae'] = mean_absolute_error(y, predictions)
         
         if 'mape' in metrics:
-            results['mape'] = np.mean(np.abs((y - predictions) / y)) * 100
+            # Use epsilon to avoid division by zero
+            eps = np.finfo(float).eps
+            results['mape'] = np.mean(np.abs((y - predictions) / (np.abs(y) + eps))) * 100
         
         if 'r2' in metrics:
             results['r2'] = r2_score(y, predictions)
@@ -327,12 +257,7 @@ class GradientBoostingModel:
         return results
     
     def save(self, file_path: str) -> None:
-        """
-        Save model to file.
-        
-        Args:
-            file_path: Output file path
-        """
+        """Serialize model to pickle file."""
         logger.info(f"Saving model to {file_path}")
         
         Path(file_path).parent.mkdir(parents=True, exist_ok=True)
@@ -351,15 +276,7 @@ class GradientBoostingModel:
     
     @classmethod
     def load(cls, file_path: str) -> 'GradientBoostingModel':
-        """
-        Load model from file.
-        
-        Args:
-            file_path: Input file path
-        
-        Returns:
-            Loaded model instance
-        """
+        """Load model from pickle file."""
         logger.info(f"Loading model from {file_path}")
         
         model_data = joblib.load(file_path)

@@ -1,10 +1,4 @@
-"""
-Model Training Script
-=====================
-
-Trains baseline and gradient boosting models with rolling origin cross-validation.
-Compares performance and saves the best model.
-"""
+"""Model training script with rolling origin CV."""
 
 import sys
 from pathlib import Path

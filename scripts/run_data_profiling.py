@@ -1,10 +1,4 @@
-"""
-Data Profiling Script
-=====================
-
-Comprehensive data profiling and exploratory data analysis.
-Generates visualizations and statistical summaries.
-"""
+"""Data profiling and EDA script."""
 
 import sys
 from pathlib import Path

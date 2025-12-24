@@ -1,28 +1,218 @@
-# XAI Load Forecasting
+<div align="center">
 
-**Day-ahead feeder load forecasting with explainability-first design**
+# ⚡ XAI Load Forecasting
+
+### Explainable Day-Ahead Electrical Load Forecasting
+
+*Transparent predictions you can trust*
 
 [![Python 3.9+](https://img.shields.io/badge/python-3.9+-blue.svg)](https://www.python.org/downloads/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
+[![Tests](https://img.shields.io/badge/tests-24%20passed-brightgreen.svg)]()
+[![Docker](https://img.shields.io/badge/docker-ready-blue.svg)]()
+[![FastAPI](https://img.shields.io/badge/API-FastAPI-009688.svg)]()
+
+[Features](#-features) • [Quick Start](#-quick-start) • [Results](#-results) • [API](#-api-serving) • [Documentation](#-documentation)
+
+</div>
 
 ---
 
-## Overview
+<div align="center">
+<img src="docs/figures/shap_summary.png" alt="SHAP Feature Importance" width="700"/>
 
-This project delivers a complete **day-ahead electrical load forecasting system** for distribution feeders with **explainability at its core**. Built on real-world data from Portugal's electrical grid (UCI dataset) and historical weather data (Open-Meteo), the system combines gradient boosting models with comprehensive SHAP analysis to provide transparent, interpretable predictions.
+*Every prediction explained: SHAP analysis reveals what drives your forecasts*
+</div>
 
-**What makes this different?** Unlike black-box forecasting models, every prediction comes with a clear explanation of which factors drove it—recent load patterns, weather conditions, time of day, or seasonal effects. This transparency is crucial for grid operators who need to trust and understand their forecasting tools.
+---
 
-### Key Features
+## 🎯 Why This Project?
 
-- **Hourly resolution** day-ahead (24h) load forecasting
-- **Explainability-first** design with SHAP analysis (global, local, time-varying)
-- **Monotonic constraints** for physically meaningful relationships
-- **Temporal rigor** - strict prevention of data leakage
-- **Rolling origin cross-validation** for robust evaluation
-- **Model Card** with scope, assumptions, calibration, and failure modes
-- **Config-driven architecture** for easy adaptation
-- **Comprehensive logging** and structured documentation
+Grid operators need **accurate** load forecasts, but they also need to **understand** them. Black-box models create risk—when predictions fail, operators can't diagnose why.
+
+**XAI Load Forecasting** solves this with:
+- 🔮 **14% better accuracy** than persistence baselines
+- 🔍 **Full transparency** via SHAP explanations for every prediction
+- ⚙️ **Production-ready** with FastAPI, Docker, and monitoring built-in
+- 📊 **Drift detection** to alert when model performance degrades
+
+---
+
+## ✨ Features
+
+| Category | Capabilities |
+|----------|-------------|
+| **Forecasting** | Day-ahead (24h) hourly predictions, multi-horizon support (1h to 1 week) |
+| **Explainability** | Global SHAP importance, local explanations, time-varying patterns |
+| **Models** | LightGBM/XGBoost with monotonic constraints, quantile regression for intervals |
+| **Validation** | Rolling origin cross-validation, temporal leak prevention |
+| **Deployment** | FastAPI server, Docker containers, CLI interface |
+| **Monitoring** | Data drift detection (KS-test), performance alerts |
+| **Optimization** | Optuna hyperparameter tuning with cross-validation |
+
+---
+
+## 📊 Results at a Glance
+
+<div align="center">
+<img src="docs/figures/model_predictions.png" alt="Model Predictions" width="800"/>
+
+*30-day test period: Actual vs Predicted load with high accuracy*
+</div>
+
+### Performance Comparison
+
+| Model | RMSE (kW) | Improvement |
+|-------|-----------|-------------|
+| Persistence (last value) | 0.892 | Baseline |
+| Seasonal Naive (last week) | 1.458 | -63% worse |
+| **LightGBM (Ours)** | **0.770** | **+14% better** |
+
+### What Drives Predictions?
+
+<div align="center">
+<img src="docs/figures/shap_bar.png" alt="Feature Importance" width="600"/>
+</div>
+
+| Rank | Feature | Insight |
+|------|---------|---------|
+| 1 | `load_lag_1h` | Recent load is the strongest predictor |
+| 2 | `rolling_24h_mean` | Daily patterns matter |
+| 3 | `temperature` | Weather impacts consumption |
+| 4 | `hour` | Time-of-day effects |
+
+---
+
+## 🚀 Quick Start
+
+### Installation
+
+```bash
+# Clone repository
+git clone https://github.com/Dex947/xai-load-forecasting.git
+cd xai-load-forecasting
+
+# Create environment
+python -m venv venv
+source venv/bin/activate  # Windows: venv\Scripts\activate
+
+# Install dependencies
+pip install -r requirements.txt
+```
+
+### CLI Usage
+
+```bash
+# Run full pipeline
+python -m src.cli train --config config/config.yaml
+
+# Generate predictions
+python -m src.cli predict --model models/artifacts/lightgbm_model.pkl
+
+# Start API server
+python -m src.cli serve --port 8000
+```
+
+### Python API
+
+```python
+from src.models.gbm import GradientBoostingModel
+from src.explainability.shap_analysis import SHAPAnalyzer
+
+# Load trained model
+model = GradientBoostingModel.load('models/artifacts/lightgbm_model.pkl')
+
+# Predict with explanation
+predictions = model.predict(X_new)
+analyzer = SHAPAnalyzer(model.model, X_background)
+shap_values = analyzer.compute_shap_values(X_new)
+```
+
+---
+
+## 🔌 API Serving
+
+Start the FastAPI server:
+
+```bash
+uvicorn src.api:app --host 0.0.0.0 --port 8000
+```
+
+### Endpoints
+
+| Endpoint | Method | Description |
+|----------|--------|-------------|
+| `/health` | GET | Health check |
+| `/predict` | POST | Single prediction with explanation |
+| `/predict/batch` | POST | Batch predictions |
+| `/features` | GET | List required features |
+| `/importance` | GET | Feature importance scores |
+
+### Docker Deployment
+
+```bash
+docker-compose up -d
+```
+
+---
+
+## 📈 Visualizations
+
+<table>
+<tr>
+<td width="50%">
+<img src="docs/figures/load_patterns.png" alt="Load Patterns"/>
+<p align="center"><em>Daily and weekly load patterns</em></p>
+</td>
+<td width="50%">
+<img src="docs/figures/residual_analysis.png" alt="Residual Analysis"/>
+<p align="center"><em>Model diagnostics confirm good fit</em></p>
+</td>
+</tr>
+<tr>
+<td width="50%">
+<img src="docs/figures/time_varying_importance.png" alt="Time-Varying SHAP"/>
+<p align="center"><em>Feature importance changes by hour/day</em></p>
+</td>
+<td width="50%">
+<img src="docs/figures/load_vs_temperature.png" alt="Temperature Effect"/>
+<p align="center"><em>Temperature-load relationship</em></p>
+</td>
+</tr>
+</table>
+
+---
+
+## 🏗️ Architecture
+
+```
+xai-load-forecasting/
+├── src/
+│   ├── data/           # Data loading & validation
+│   ├── features/       # Feature engineering pipeline
+│   ├── models/         # LightGBM, quantile, multi-horizon
+│   ├── explainability/ # SHAP analysis & visualizations
+│   ├── monitoring/     # Drift detection & alerts
+│   ├── api.py          # FastAPI server
+│   └── cli.py          # Command-line interface
+├── config/             # YAML configuration
+├── tests/              # Pytest test suite (24 tests)
+├── models/artifacts/   # Trained models
+├── docs/               # Documentation & figures
+├── Dockerfile          # Container deployment
+└── docker-compose.yml  # Multi-service orchestration
+```
+
+---
+
+## 📚 Documentation
+
+| Document | Description |
+|----------|-------------|
+| [Model Card](docs/model_card.md) | Scope, limitations, failure modes |
+| [CHANGELOG](CHANGELOG.md) | Version history |
+| [CONTRIBUTING](CONTRIBUTING.md) | Contribution guidelines |
+| [API Docs](http://localhost:8000/docs) | Interactive API documentation |
 
 ---
 
@@ -553,7 +743,7 @@ If you use this project in your research, please cite:
   author = {Dex947},
   year = {2025},
   url = {https://github.com/Dex947/xai-load-forecasting},
-  version = {1.0.1}
+  version = {2.0.0}
 }
 ```
 ---
@@ -648,4 +838,4 @@ This project builds on excellent open-source tools:
 
 See [CHANGELOG.md](CHANGELOG.md) for detailed version history.
 
-**Current Version**: 1.0.0 (2025-10-07)
+**Current Version**: 2.0.0 (2025-12-24)

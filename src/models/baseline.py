@@ -1,16 +1,4 @@
-"""
-Baseline Models
-===============
-
-Simple baseline models for comparison.
-Includes persistence, seasonal naive, and moving average models.
-
-Usage:
-    from src.models.baseline import BaselineModel
-    
-    model = BaselineModel(method='seasonal_naive', season_length=24)
-    predictions = model.predict(train_data, horizon=24)
-"""
+"""Baseline models: persistence, seasonal naive, moving average."""
 
 import pandas as pd
 import numpy as np

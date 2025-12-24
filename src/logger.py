@@ -1,17 +1,4 @@
-"""
-Structured Logging Module
-==========================
-
-Provides centralized logging configuration for the entire system.
-All modules should use this logger instead of print statements.
-
-Usage:
-    from src.logger import get_logger
-    
-    logger = get_logger(__name__)
-    logger.info("Processing started")
-    logger.error("Error occurred", exc_info=True)
-"""
+"""Centralized logging configuration."""
 
 import logging
 import sys

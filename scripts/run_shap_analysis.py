@@ -1,10 +1,4 @@
-"""
-SHAP Analysis Script
-====================
-
-Generates comprehensive SHAP-based explainability analysis.
-Creates global, local, and time-varying SHAP visualizations.
-"""
+"""SHAP analysis and visualization script."""
 
 import sys
 from pathlib import Path

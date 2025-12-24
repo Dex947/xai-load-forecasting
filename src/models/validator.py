@@ -1,16 +1,5 @@
 """
-Rolling Origin Cross-Validation
-================================
-
-Implements rolling origin (time-series) cross-validation.
-Ensures proper temporal validation without data leakage.
-
-Usage:
-    from src.models.validator import RollingOriginValidator
-    
-    validator = RollingOriginValidator(n_splits=5, test_size_days=30)
-    for train_idx, test_idx in validator.split(df):
-        # Train and evaluate
+Time-series cross-validation with rolling origin.
 """
 
 import pandas as pd
@@ -24,9 +13,7 @@ logger = get_logger(__name__)
 
 
 class RollingOriginValidator:
-    """
-    Rolling origin cross-validation for time series.
-    
+    """Rolling origin CV that prevents temporal leakage.
     Ensures temporal ordering: train data always comes before test data.
     Supports gap between train and test to simulate real forecasting scenarios.
     """
@@ -215,9 +202,7 @@ class RollingOriginValidator:
 
 
 class ExpandingWindowValidator:
-    """
-    Expanding window cross-validation.
-    
+    """Expanding window CV with growing training set.
     Similar to rolling origin, but training window expands instead of sliding.
     """
     

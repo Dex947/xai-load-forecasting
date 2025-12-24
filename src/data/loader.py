@@ -1,16 +1,4 @@
-"""
-Data Loader Module
-==================
-
-Handles loading of load data, weather data, and other external datasets.
-Ensures proper timezone handling and data type consistency.
-
-Usage:
-    from src.data.loader import load_load_data, load_weather_data
-    
-    load_df = load_load_data("data/raw/load_data.csv")
-    weather_df = load_weather_data("data/external/weather.csv")
-"""
+"""Data loading utilities for load and weather data."""
 
 import pandas as pd
 import numpy as np
@@ -31,23 +19,7 @@ def load_load_data(
     timezone: str = "UTC",
     parse_dates: bool = True
 ) -> pd.DataFrame:
-    """
-    Load electrical load data from file.
-    
-    Args:
-        file_path: Path to load data file (CSV, Parquet, etc.)
-        date_column: Name of the timestamp column
-        load_column: Name of the load column
-        timezone: Timezone for timestamp data
-        parse_dates: Whether to parse dates automatically
-    
-    Returns:
-        DataFrame with timestamp index and load column
-    
-    Raises:
-        FileNotFoundError: If file doesn't exist
-        ValueError: If required columns are missing
-    """
+    """Load electrical load data from CSV/Parquet with timezone handling."""
     logger.info(f"Loading load data from: {file_path}")
     
     file_path_obj = Path(file_path)
@@ -113,21 +85,7 @@ def load_weather_data(
     timezone: str = "UTC",
     parse_dates: bool = True
 ) -> pd.DataFrame:
-    """
-    Load weather data from file.
-    
-    Args:
-        file_path: Path to weather data file
-        date_column: Name of the timestamp column
-        timezone: Timezone for timestamp data
-        parse_dates: Whether to parse dates automatically
-    
-    Returns:
-        DataFrame with timestamp index and weather features
-    
-    Raises:
-        FileNotFoundError: If file doesn't exist
-    """
+    """Load weather data from CSV/Parquet with timezone handling."""
     logger.info(f"Loading weather data from: {file_path}")
     
     file_path_obj = Path(file_path)
@@ -185,21 +143,7 @@ def merge_load_weather(
     how: str = "left",
     validate_alignment: bool = True
 ) -> pd.DataFrame:
-    """
-    Merge load and weather data on timestamp index.
-    
-    Args:
-        load_df: Load data DataFrame
-        weather_df: Weather data DataFrame
-        how: Merge method ('left', 'inner', 'outer')
-        validate_alignment: Validate timestamp alignment
-    
-    Returns:
-        Merged DataFrame
-    
-    Raises:
-        ValueError: If timestamp alignment is invalid
-    """
+    """Merge load and weather DataFrames on timestamp index."""
     logger.info("Merging load and weather data")
     
     if validate_alignment:
@@ -243,15 +187,7 @@ def save_processed_data(
     format: str = "parquet",
     compression: Optional[str] = "snappy"
 ) -> None:
-    """
-    Save processed data to file.
-    
-    Args:
-        df: DataFrame to save
-        file_path: Output file path
-        format: Output format ('parquet', 'csv')
-        compression: Compression method
-    """
+    """Save DataFrame to parquet or CSV."""
     logger.info(f"Saving processed data to: {file_path}")
     
     file_path_obj = Path(file_path)

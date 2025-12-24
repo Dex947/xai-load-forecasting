@@ -6,6 +6,40 @@ and this project adheres to [semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [2.0.0] - 2025-12-24
+
+### Added
+
+**Testing & CI**:
+- Pytest test suite with 24 tests covering data loading, features, models, and explainability
+- GitHub Actions CI workflow with linting (ruff), type checking (mypy), and testing
+- Multi-Python version testing (3.9, 3.10, 3.11)
+
+**CLI Interface**:
+- Click-based CLI (`src/cli.py`) with commands for all pipeline stages
+- Commands: `profile`, `features`, `train`, `explain`, `predict`, `test`, `serve`
+
+**API & Deployment**:
+- FastAPI serving layer (`src/api.py`) with prediction and explanation endpoints
+- Docker containerization (Dockerfile, docker-compose.yml)
+- Health check and batch prediction endpoints
+
+**Advanced Modeling**:
+- Prediction intervals via LightGBM quantile regression (`src/models/quantile.py`)
+- Hyperparameter optimization with Optuna (`src/models/tuning.py`)
+- Multi-horizon forecasting with direct strategy (`src/models/multi_horizon.py`)
+
+**Monitoring**:
+- Data drift detection using Kolmogorov-Smirnov tests (`src/monitoring/drift.py`)
+- Performance monitoring with degradation alerts
+
+### Changed
+
+- Fixed MAPE calculation to prevent division by zero
+- Updated requirements.txt with new dependencies (click, fastapi, uvicorn, optuna, pydantic-settings)
+
+---
+
 ## [1.0.0] - 2025-10-07
 
 ### Release Notes

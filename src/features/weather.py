@@ -1,16 +1,4 @@
-"""
-Weather Feature Engineering
-============================
-
-Creates weather-based features and derived weather metrics.
-Handles temperature-based degree days, heat index, and interactions.
-
-Usage:
-    from src.features.weather import WeatherFeatureEngineer
-    
-    engineer = WeatherFeatureEngineer(config)
-    features = engineer.create_features(df)
-"""
+"""Weather-derived feature engineering."""
 
 import pandas as pd
 import numpy as np
@@ -22,31 +10,15 @@ logger = get_logger(__name__)
 
 
 class WeatherFeatureEngineer:
-    """
-    Creates weather-based features and derived metrics.
-    """
+    """Computes HDD, CDD, heat index, and weather interactions."""
     
     def __init__(self, weather_config: Optional[Dict] = None):
-        """
-        Initialize weather feature engineer.
-        
-        Args:
-            weather_config: Weather feature configuration
-        """
         self.weather_config = weather_config or {}
         self.derived_config = self.weather_config.get('derived_features', {})
         logger.info("Weather feature engineer initialized")
     
     def create_derived_features(self, df: pd.DataFrame) -> pd.DataFrame:
-        """
-        Create derived weather features.
-        
-        Args:
-            df: DataFrame with base weather features
-        
-        Returns:
-            DataFrame with derived weather features
-        """
+        """Compute HDD, CDD, heat index, discomfort index, temp range."""
         logger.info("Creating derived weather features")
         
         features_df = pd.DataFrame(index=df.index)
@@ -111,17 +83,7 @@ class WeatherFeatureEngineer:
         weather_columns: List[str],
         lag_hours: List[int]
     ) -> pd.DataFrame:
-        """
-        Create lagged weather features.
-        
-        Args:
-            df: DataFrame with weather columns
-            weather_columns: List of weather column names
-            lag_hours: List of lag hours
-        
-        Returns:
-            DataFrame with lagged weather features
-        """
+        """Create lagged weather features."""
         logger.info(f"Creating lagged weather features for {len(weather_columns)} columns")
         
         lag_df = pd.DataFrame(index=df.index)
@@ -144,16 +106,7 @@ class WeatherFeatureEngineer:
         df: pd.DataFrame,
         interactions_config: Optional[Dict] = None
     ) -> pd.DataFrame:
-        """
-        Create interaction features between weather and temporal variables.
-        
-        Args:
-            df: DataFrame with weather and temporal features
-            interactions_config: Interaction feature configuration
-        
-        Returns:
-            DataFrame with interaction features
-        """
+        """Create temp×hour, temp×weekend, humidity×temp interactions."""
         logger.info("Creating interaction features")
         
         interactions_config = interactions_config or {}
@@ -183,18 +136,7 @@ class WeatherFeatureEngineer:
     
     @staticmethod
     def _calculate_heat_index(temp_c: pd.Series, humidity: pd.Series) -> pd.Series:
-        """
-        Calculate heat index (apparent temperature).
-        
-        Simplified formula for Celsius.
-        
-        Args:
-            temp_c: Temperature in Celsius
-            humidity: Relative humidity (0-100)
-        
-        Returns:
-            Heat index in Celsius
-        """
+        """Rothfusz heat index formula (Celsius)."""
         # Convert to Fahrenheit for calculation
         temp_f = temp_c * 9/5 + 32
         
@@ -221,33 +163,13 @@ class WeatherFeatureEngineer:
     
     @staticmethod
     def _calculate_discomfort_index(temp_c: pd.Series, humidity: pd.Series) -> pd.Series:
-        """
-        Calculate discomfort index (Thom's formula).
-        
-        Args:
-            temp_c: Temperature in Celsius
-            humidity: Relative humidity (0-100)
-        
-        Returns:
-            Discomfort index
-        """
+        """Thom's discomfort index."""
         di = temp_c - 0.55 * (1 - humidity / 100) * (temp_c - 14.5)
         return di
     
     @staticmethod
     def _calculate_wind_chill(temp_c: pd.Series, wind_speed_ms: pd.Series) -> pd.Series:
-        """
-        Calculate wind chill temperature.
-        
-        Valid for temperatures ≤ 10°C and wind speeds > 4.8 km/h.
-        
-        Args:
-            temp_c: Temperature in Celsius
-            wind_speed_ms: Wind speed in m/s
-        
-        Returns:
-            Wind chill temperature in Celsius
-        """
+        """Environment Canada wind chill formula."""
         # Convert wind speed to km/h
         wind_speed_kmh = wind_speed_ms * 3.6
         
